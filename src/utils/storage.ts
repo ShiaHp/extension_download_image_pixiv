@@ -1,10 +1,12 @@
-import { API } from './api'
+
 
 
 export interface LocalStorage {
     idSingle?: string;
     options?: LocalStorageOptions;
     imgUrl?: string;
+    idArtist? : string;
+    arrUrl?: Array<string>
 }
 export interface LocalStorageOptions {
     userDefault: string;
@@ -55,3 +57,41 @@ export function clearImageUrl() : Promise<void> {
         chrome.storage.local.clear()
     })
 }
+
+export function setIDArtistStorage (idArtist: string) : Promise<void> {
+    const val : LocalStorage = {
+        idArtist
+    }
+    return new Promise((resolve) => {
+        chrome.storage.local.set(val, () =>{
+            resolve()
+        })
+    })
+}
+
+export function getIDArtistStorage() : Promise<string> {
+    const keys : LocalStorageKeys = 'idArtist'
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(keys, (res: LocalStorage) => {
+            resolve(res.idArtist ?? '')
+        })
+    })
+}
+
+// export function setArrayImageStorage( arrUrl : Array<string> ) : Promise<void> {
+//     const vals : LocalStorage = { arrUrl}
+//     console.log(vals)
+//     return new Promise((resolve) =>{
+//         chrome.storage.local.set(vals , () =>{
+//             resolve();
+//         })
+//     })
+// }
+// export function getArrayImageStorage() : Promise<Array<string>> {
+//     const keys : LocalStorageKeys = 'arrUrl'
+//     return new Promise((resolve) =>{
+//         chrome.storage.local.get(keys , (res : LocalStorage) =>{
+//             resolve(res.arrUrl);
+//         })
+//     })
+// }

@@ -16,7 +16,6 @@ chrome.runtime.onInstalled.addListener(() => {
   })
 
   chrome.contextMenus.onClicked.addListener((event) => {
-    console.log(event)
     const UrlPixiv = `${event.linkUrl}`;
 
     fetch(UrlPixiv)
@@ -36,6 +35,11 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((event) => {
+  if (event.selectionText.length <= 6) {
+    chrome.tabs.create({
+      url: `https://nhentai.net/g/${event.selectionText.trim()}`,
+    });
+  } else {
   setStoredSingle(event.selectionText)
   getStoredSingle().then(async (idSingle) => {
     await API.getArtwordData(idSingle).then((data) => {
@@ -46,6 +50,7 @@ chrome.contextMenus.onClicked.addListener((event) => {
       setImageUrlStorage(data.body.urls.original)
     })
   })
+}
 })
 
 

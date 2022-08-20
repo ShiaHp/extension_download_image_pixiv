@@ -1,10 +1,6 @@
 
 # extension_download_pixiv
  
-To do :
-- Fix bug that cannot download from others site ✅
-- Fix bug cannot download from one click ✅
-- Fix bug cannot remove last tabs created by extension ✅
 
 Usage :
  + With youtobe :

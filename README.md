@@ -8,6 +8,8 @@
     + Download novel
     + Download all image from bookmarks user
 
+Demo :
+https://youtu.be/bIzEWXOHi8s
 Usage :
 + With Popup : 
 ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc1.png)

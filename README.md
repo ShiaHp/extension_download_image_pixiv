@@ -8,6 +8,7 @@ Example : https://www.pixiv.net/en/artworks/100363227
  
 - TO DO :
     + Download image from artist and get the current url of artist : ✅
+    + Download image from click icon on pixiv artworks : ✅
     + Download manga 
     + Download novel
     + Download all image from bookmarks user

@@ -53,6 +53,14 @@ const App: React.FC<{}> = () => {
       });
     });
   }
+
+  chrome.runtime.sendMessage({ notification: "download" }, () => {
+    chrome.runtime.onMessage.addListener(function (request) {
+      if (request.notification === "close-window") {
+        window.close();
+      }
+    });
+  });
   return (
     <Box mx="9px" my="16px">
       <Grid container>

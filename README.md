@@ -13,9 +13,13 @@ Example : https://www.pixiv.net/en/artworks/100363227
     + Download novel
     + Download all image from bookmarks user
 
+Demo :
+https://youtu.be/bIzEWXOHi8s
 Usage :
 + With Popup : 
-
+![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc1.png)
+![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc2.png)
+![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc3.png)
  + With youtube :
  ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/1.png)
   ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/2.png)

@@ -11,6 +11,7 @@ export interface ArtworkData {
       original: string;
     };
     alt: string;
+    pageCount : number
   };
 }
 const myHeaders = new Headers();

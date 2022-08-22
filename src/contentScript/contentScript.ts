@@ -1,4 +1,3 @@
-
 import { API } from "../utils/api";
 import {
   setStoredSingle,
@@ -6,6 +5,7 @@ import {
   getImageUrl,
   setImageUrlStorage,
   clearImageUrl,
+  getImageUrlOriginal
 } from "../utils/storage";
 var myHeaders = new Headers();
 myHeaders.append("sec-fetch-site", "cross-site");
@@ -20,6 +20,44 @@ var requestOptions = {
 };
 
 getImageUrl().then((res) => {
+  if (res) {
+    fetch(res, requestOptions)
+      .then((response) => {
+        if (response.status === 404) {
+          return fetch(res.replace(".jpg", ".png"), requestOptions);
+        } else{
+          return response;
+
+        }
+      })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `pixiv-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .then(() => {
+        chrome.runtime.sendMessage({ notification: "Close" });
+      })
+      .catch((e) => console.log(e));
+  }
+});
+
+
+
+
+
+
+
+
+
+
+getImageUrlOriginal().then((res) => {
   if (res.length > 0) {
     fetch(res, requestOptions)
       .then((response) => response.blob())
@@ -39,6 +77,23 @@ getImageUrl().then((res) => {
       .catch((e) => console.log(e));
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 chrome.storage.local.get("arrUrl", async function (res) {
 
   if (res.arrUrl.length > 0) {
@@ -59,11 +114,12 @@ chrome.storage.local.get("arrUrl", async function (res) {
     });
 
     await Promise.all(response).then((files) => {
-      files.forEach((file) => console.log(file));
+      
+        chrome.runtime.sendMessage({ notification: `Close` , data : files.length} )
+      
+     
     });
   }
 });
 
 clearImageUrl();
-
-

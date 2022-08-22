@@ -4,6 +4,7 @@ export interface LocalStorage {
   imgUrl?: string;
   idArtist?: string;
   arrUrl?: Array<string>;
+  imgUrlOriginal? : string;
 }
 export interface LocalStorageOptions {
   userDefault: string;
@@ -39,6 +40,24 @@ export function setImageUrlStorage(imgUrl: string): Promise<void> {
   });
 }
 
+export function setImageUrlOriginalStorage(imgUrlOriginal: string): Promise<void> {
+  const vals: LocalStorage = {
+    imgUrlOriginal,
+  };
+  return new Promise((resolve) => {
+    chrome.storage.local.set(vals, () => {
+      resolve();
+    });
+  });
+}
+export function getImageUrlOriginal(): Promise<string> {
+  const keys: LocalStorageKeys = "imgUrlOriginal";
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(keys, (res: LocalStorage) => {
+      resolve(res.imgUrlOriginal?? "");
+    });
+  });
+}
 export function getImageUrl(): Promise<string> {
   const keys: LocalStorageKeys = "imgUrl";
   return new Promise((resolve, reject) => {

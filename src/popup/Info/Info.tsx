@@ -45,7 +45,7 @@ const result1 = []
             userKeyIds.push({ keyPairId: arrUrl, HasBeenUploadedYet: false });
             chrome.storage.local.set({ userKeyIds: userKeyIds }, function () {
                 chrome.storage.local.get("userKeyIds",async function (result) {
-                    console.log(result.userKeyIds[0].keyPairId);
+
                     const response = result.userKeyIds[0].keyPairId.map((item) => {
                         return API.getArtwordData(item);
                       });
@@ -54,7 +54,7 @@ const result1 = []
                           result1.push(file.body.urls.original)
                         });
                       });
-            chrome.storage.local.set({ arrUrl : result1}, () =>{
+            chrome.storage.local.set({ arrUrl1 : result1}, () =>{
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                     chrome.tabs.reload(tabs[0].id);
                   });

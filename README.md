@@ -13,7 +13,7 @@
   - Fix bug cannot download image end with '.jpg' replace by '.png' : ✅ ( now user can download original image by right-click)
   - Download manga
   - Download novel
-  - Download all image from bookmarks user
+  - Download all image from bookmarks user: ✅
 
 Demo :
 https://youtu.be/bIzEWXOHi8s

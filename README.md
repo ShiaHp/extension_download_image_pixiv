@@ -8,9 +8,9 @@
   - Download novel
   - Download all image from bookmarks user: ✅
 
-Quick demo what you can do with this extension,please watch :
-https://youtu.be/wEAi9i2x5Wk
-Usage :
+- Quick demo what you can do with this extension,please watch :
+    - https://youtu.be/wEAi9i2x5Wk
+- Usage :
 
 
 - With youtube :

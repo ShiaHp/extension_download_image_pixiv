@@ -7,6 +7,9 @@
   - Download manga
   - Download novel
   - Download all image from bookmarks user: ✅
+  - Download image from recommended data
+  - Adding image to bookmarks
+  
 
 - Quick demo what you can do with this extension,please watch :
     - https://youtu.be/wEAi9i2x5Wk
@@ -22,5 +25,7 @@
 
 * To run this project:
 
+- Install nodejs version below v18
 - Please "npm install"
-- Then "npm start" to build
+- Then "npm start" to build file "dist"
+- "Load unpacked" in manage Chrome extension with file dist

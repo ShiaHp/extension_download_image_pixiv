@@ -26,7 +26,8 @@ const requestOptions = {
 export class API {
   static sendGetRequest<T>(url: string): Promise<T> {
     return new Promise((resolve, reject) => {
-      fetch(url, requestOptions)
+    
+        fetch(url, requestOptions)
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -43,6 +44,8 @@ export class API {
         .catch((error) => {
           reject(error);
         });
+  
+      
     });
   }
 
@@ -56,7 +59,7 @@ export class API {
     return this.sendGetRequest(url);
   }
 
-  static getArtwordData(id: string): Promise<ArtworkData> {
+  static getArtwordData(id: any): Promise<ArtworkData> {
     const url = `https://www.pixiv.net/ajax/illust/${id}`;
     return this.sendGetRequest(url);
   }

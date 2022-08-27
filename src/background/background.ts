@@ -8,6 +8,9 @@ import {
 } from "../utils/storage";
 import { API } from "../utils/api";
 
+
+
+
 const functionDownloadImage = async (id: string) => {
   await API.getArtwordData(id).then((data) => {
     chrome.tabs.create({
@@ -29,19 +32,19 @@ chrome.runtime.onInstalled.addListener(() => {
     const UrlPixiv = `${event.linkUrl}`;
     const urlPixiv = event.linkUrl.match(/artworks\/(\d{2,15})/);
     const result = []
-  const resultUrl = urlPixiv === null ? UrlPixiv : urlPixiv[1]
-    if(resultUrl.length > 25){
+    const resultUrl = urlPixiv === null ? UrlPixiv : urlPixiv[1]
+    if (resultUrl.length > 25) {
       fetch(resultUrl)
-      .then((res) => res.text())
-      .then((html) => {
-        const url = html.match(/https.*?master1200/gm)[2].replace("master","original").replace("_master1200","") + ".jpg";
-        chrome.tabs.create({
-          active: false,
-          url: url,
+        .then((res) => res.text())
+        .then((html) => {
+          const url = html.match(/https.*?master1200/gm)[2].replace("master", "original").replace("_master1200", "") + ".jpg";
+          chrome.tabs.create({
+            active: false,
+            url: url,
+          });
+          setImageUrlStorage(url);
         });
-        setImageUrlStorage(url);
-      });
-    } else{
+    } else {
       await API.getArtwordData(resultUrl).then((res) => {
         //  res.body.pageCount
         for (let i = 0; i < res.body.pageCount; i++) {
@@ -57,7 +60,7 @@ chrome.runtime.onInstalled.addListener(() => {
         })
       })
     }
-    
+
 
   });
 });
@@ -108,3 +111,4 @@ chrome.runtime.onMessage.addListener(function (request) {
     );
   }
 });
+

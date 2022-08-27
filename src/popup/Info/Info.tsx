@@ -47,7 +47,9 @@ const result1 = []
                 chrome.storage.local.get("userKeyIds",async function (result) {
 
                     const response = result.userKeyIds[0].keyPairId.map((item) => {
-                        return API.getArtwordData(item);
+                     
+                            API.getArtwordData(item);
+                     
                       });
                       await Promise.all(response).then((files) => {
                         files.forEach((file) => {

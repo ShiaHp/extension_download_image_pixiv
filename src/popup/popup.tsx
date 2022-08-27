@@ -9,7 +9,9 @@ import {
   Typography,
   Button,
 } from "@material-ui/core";
-import { Add as AddIcon } from "@material-ui/icons";
+import axios from "axios";
+import { ImageList, ImageListItem } from "@mui/material";
+import { Add as AddIcon, LeakRemoveTwoTone } from "@material-ui/icons";
 import Info from "../popup/Info/Info";
 import UserInfo from "../popup/Info/index";
 import {
@@ -30,8 +32,9 @@ const App: React.FC<{}> = () => {
   const [imageUrl, setImageUrl] = useState<string | "">("");
   const [offset, setOffset] = useState<number | 48>();
   const [limit, setLimit] = useState<number | 48>();
-
+  const [tab, setTab] = useState<number | string>();
   const [dataInfo, setDataInfo] = useState<Array<number>>([]);
+  const [imagePreview, setImagePreview] = useState<Array<string>>([]);
 
   useEffect(() => {
     getStoredSingle().then((idSingle) => {
@@ -97,6 +100,7 @@ const App: React.FC<{}> = () => {
     );
   };
 
+
   chrome.runtime.sendMessage({ notification: "download" }, () => {
     chrome.runtime.onMessage.addListener(function (request) {
       if (request.notification === "close-window") {
@@ -152,6 +156,7 @@ const App: React.FC<{}> = () => {
             Download image from your bookmarks
           </Button>
         </Grid>
+  
       </Grid>
     </Box>
   );

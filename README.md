@@ -1,7 +1,10 @@
 # extension_download_pixiv
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 8e18fe29d557829fe3d90a3c75410391ee857798
 - TO DO :
   - Download image from artist and get the current url of artist : ✅
   - Download image from click icon on pixiv artworks : ✅
@@ -9,25 +12,29 @@
   - Download manga
   - Download novel
   - Download all image from bookmarks user: ✅
+<<<<<<< HEAD
   - Adding icon to download image : ✅
+=======
+  - Download image from recommended data
+  - Adding image to bookmarks
+  
 
-Demo :
-https://youtu.be/bIzEWXOHi8s
-Usage :
+- Quick demo what you can do with this extension,please watch :
+    - https://youtu.be/wEAi9i2x5Wk
+- Usage :
+>>>>>>> 8e18fe29d557829fe3d90a3c75410391ee857798
 
-- With Popup :
-  ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc1.png)
-  ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc2.png)
-  ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/sc3.png)
+
 - With youtube :
   ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/1.png)
   ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/2.png)
-
 - With Facebook :
   ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/4.png)
   ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/5.png)
 
 * To run this project:
 
+- Install nodejs version below v18
 - Please "npm install"
-- Then "npm start" to build
+- Then "npm start" to build file "dist"
+- "Load unpacked" in manage Chrome extension with file dist

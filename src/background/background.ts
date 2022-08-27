@@ -8,7 +8,39 @@ import {
 } from "../utils/storage";
 import { API } from "../utils/api";
 
+const regex = /access-control-allow-origin/i
 
+function removeMatchingHeaders(
+  headers: chrome.webRequest.HttpHeader[],
+  regex: RegExp
+) {
+  for (let i = 0, header; (header = headers[i]); i++) {
+    if (header.name.match(regex)) {
+      headers.splice(i, 1)
+      return
+    }
+  }
+}
+
+function responseListener(
+  details: chrome.webRequest.WebResponseHeadersDetails
+) {
+  removeMatchingHeaders(details.responseHeaders!, regex)
+  details.responseHeaders!.push({
+    name: 'access-control-allow-origin',
+    value: '*',
+  })
+
+  return { responseHeaders: details.responseHeaders }
+}
+
+chrome.webRequest.onHeadersReceived.addListener(
+  responseListener,
+  {
+    urls: ['*://*.pximg.net/*', '*://*.pixiv.cat/*'],
+  },
+  ['blocking', 'responseHeaders', 'extraHeaders']
+)
 
 
 const functionDownloadImage = async (id: string) => {
@@ -112,3 +144,6 @@ chrome.runtime.onMessage.addListener(function (request) {
   }
 });
 
+
+ 
+    

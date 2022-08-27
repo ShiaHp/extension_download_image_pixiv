@@ -9,30 +9,23 @@ import {
 } from "../utils/storage";
 import { checkURL } from "../utils/checkUrl";
 
-var myHeaders = new Headers();
-myHeaders.append("sec-fetch-site", "cross-site");
-myHeaders.append("referer", "https://www.pixiv.net/");
-myHeaders.append(
-  "User-Agent",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
-);
-var requestOptions = {
-  method: "GET",
-  headers: myHeaders,
-};
-
-
-
 function downloadImage(url: string) {
   return new Promise((resolve, reject) => {
-    fetch(url, requestOptions).then((response) => {
-      if (response.status == 404) {
-        const newUrlToFetch = response.url.replace(".jpg", ".png");
-        return fetch(newUrlToFetch, requestOptions);
-      } else {
-        return response;
-      }
+    fetch(url, {
+      method: "get",
+      credentials: "same-origin",
     })
+      .then((response) => {
+        if (response.status == 404) {
+          const newUrlToFetch = response.url.replace(".jpg", ".png");
+          return fetch(newUrlToFetch, {
+            method: "get",
+            credentials: "same-origin",
+          });
+        } else {
+          return response;
+        }
+      })
       .then((response) => response.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
@@ -44,10 +37,9 @@ function downloadImage(url: string) {
         a.click();
         URL.revokeObjectURL(url);
       })
-      .catch((e) => console.log(e));
-  })
+      .catch((e) => {console.log(e), chrome.runtime.reload()});
+  });
 }
-
 
 const imagesArray = document.getElementsByTagName("img");
 
@@ -78,21 +70,19 @@ setInterval(() => {
       button.style.transform = "scale(0.98)";
       button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
       async function DownloadImage(url: string) {
-        const count = await checkURL.checkManyPageCount(url)
+        const count = await checkURL.checkManyPageCount(url);
         if (count <= 1) {
           const newUrl: any = checkURL.checkURLmedium(url);
-          downloadImage(newUrl)
+
+          downloadImage(newUrl);
         } else {
           const newUrl: any = checkURL.checkURLmedium(url);
           for (let i = 0; i < count; i++) {
-            const url = `${newUrl}`.replace('_p0', `_p${i}`)
-            downloadImage(url)
+            const url = `${newUrl}`.replace("_p0", `_p${i}`);
+            downloadImage(url);
           }
-
         }
-
       }
-
 
       imagesArray[i].addEventListener("mouseover", function (e) {
         linkImg = this.src;
@@ -115,7 +105,10 @@ getImageUrl().then((res) => {
 
 getImageUrlOriginal().then((res) => {
   if (res.length > 0) {
-    fetch(res, requestOptions)
+    fetch(res, {
+      method: "get",
+      credentials: "same-origin",
+    })
       .then((response) => response.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
@@ -137,12 +130,11 @@ getImageUrlOriginal().then((res) => {
 chrome.storage.local.get("arrUrl1", async function (res) {
   if (res || res.arrUrl1.length > 0) {
     const response = res.arrUrl1.map((url) => {
-      return downloadImage(url)
+      return downloadImage(url);
     });
 
     await Promise.all(response).then((files) => {
-      console.log(files)
-
+      console.log(files);
     });
   }
 });
@@ -150,10 +142,10 @@ chrome.storage.local.get("arrUrl1", async function (res) {
 chrome.storage.local.get("arrUrl", async function (res) {
   if (res || res.arrUrl.length > 0) {
     const response = res.arrUrl.map((url) => {
-      return downloadImage(url)
+      return downloadImage(url);
     });
     await Promise.all(response).then((files) => {
-      chrome.runtime.sendMessage({ notification: `Close`, data: files.length })
+      chrome.runtime.sendMessage({ notification: `Close`, data: files.length });
     });
   }
 });

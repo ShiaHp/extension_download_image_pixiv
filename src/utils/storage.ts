@@ -54,7 +54,7 @@ export function getImageUrlOriginal(): Promise<string> {
   const keys: LocalStorageKeys = "imgUrlOriginal";
   return new Promise((resolve, reject) => {
     chrome.storage.local.get(keys, (res: LocalStorage) => {
-      resolve(res.imgUrlOriginal?? "");
+      resolve(res.imgUrlOriginal ?? "");
     });
   });
 }

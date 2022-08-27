@@ -17,6 +17,7 @@
 =======
   - Download image from recommended data
   - Adding image to bookmarks
+  - Fix bug CORS : ( căng cực 😂)
   
 
 - Quick demo what you can do with this extension,please watch :
@@ -38,3 +39,5 @@
 - Please "npm install"
 - Then "npm start" to build file "dist"
 - "Load unpacked" in manage Chrome extension with file dist
+
+

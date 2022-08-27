@@ -27,7 +27,9 @@ export class API {
   static sendGetRequest<T>(url: string): Promise<T> {
     return new Promise((resolve, reject) => {
     
-        fetch(url, requestOptions)
+        fetch(url,  {
+          method: 'get',
+          credentials: 'same-origin'})
         .then((response) => {
           if (response.ok) {
             return response.json();

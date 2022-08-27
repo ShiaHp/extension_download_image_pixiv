@@ -18,10 +18,23 @@ export class checkURL {
     }
 
     static checkURLmedium(url: string): string {
-        const newmessage = url.replace("master", "original").replace("_master1200", "").split("c/540x540_70/")[1];
-        const headers = 'https://i.pximg.net/'.concat(newmessage)
-        return headers
+        console.log(url)
+        const str1 = "custom";
 
+        if (url.indexOf(str1) >= 0) {
+            const newmessage = url.replace("/custom-thumb", "img-original").replace("_custom1200", "").split("c/360x360_70")[1];
+            const headers = 'https://i.pximg.net/'.concat(newmessage)
+            return headers
+        } else {
+            const newmessage = url.replace("master", "original").replace("_square1200", "").split("/c/360x360_70/")[1];
+            const headers = 'https://i.pximg.net/'.concat(newmessage)
+            return headers
+
+        }
+
+        // const newmessage = url.replace("master", "original").replace("_master1200", "").split("c/540x540_70/")[1];
+        // const headers = 'https://i.pximg.net/'.concat(newmessage)
+        // return headers
 
 
 

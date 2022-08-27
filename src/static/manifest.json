@@ -2,13 +2,13 @@
   "name": "Pixiv-Downloader",
   "description": "Pixiv-Downloader",
   "version": "1.0.1",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
   },
-  "action": {
+  "browser_action": {
     "default_popup": "popup.html",
     "default_title": "Pixiv-Downloader",
     "default_icon": "icon.png"
@@ -22,13 +22,15 @@
     "scripting",
     "webRequest",
     "downloads",
-    "downloads.shelf"
-    
-  ],
-  "host_permissions": [
+    "downloads.shelf",
     "*://www.pixiv.net/*",
+    "*://www.pixivision.net/*",
+    "*://*.techorus-cdn.com/*",
     "*://*.pximg.net/*",
-    "*://*.pixiv.cat/*"
+    "*://*.pixiv.cat/*",
+    "webRequest",
+    "webRequestBlocking",
+    "management" 
   ],
   "options_page": "options.html",
   "background": {
@@ -36,7 +38,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://www.pixiv.net/*"],
+      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*"],
       "js": [
         "contentScript.js"
       ]

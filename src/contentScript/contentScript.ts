@@ -13,7 +13,7 @@ function downloadImage(url: string) {
   return new Promise((resolve, reject) => {
     fetch(url, {
       method: "get",
-      credentials: "same-origin",
+      credentials: "same-origin"
     })
       .then((response) => {
         if (response.status == 404) {
@@ -37,7 +37,7 @@ function downloadImage(url: string) {
         a.click();
         URL.revokeObjectURL(url);
       })
-      .catch((e) => {console.log(e), chrome.runtime.reload()});
+      .catch((e) => console.log(e));
   });
 }
 

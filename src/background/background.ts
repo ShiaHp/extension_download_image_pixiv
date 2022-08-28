@@ -65,7 +65,8 @@ chrome.runtime.onInstalled.addListener(() => {
     const urlPixiv = event.linkUrl.match(/artworks\/(\d{2,15})/);
     const result = []
     const resultUrl = urlPixiv === null ? UrlPixiv : urlPixiv[1]
-    if (resultUrl.length > 25) {
+
+    if (resultUrl.length > 12) {
       fetch(resultUrl)
         .then((res) => res.text())
         .then((html) => {
@@ -101,7 +102,6 @@ chrome.contextMenus.onClicked.addListener((event) => {
   if (event.selectionText.length <= 6) {
     chrome.tabs.create({
       url: `https://nhentai.net/g/${event.selectionText.trim()}`,
-
     });
   } else {
     setStoredSingle(event.selectionText);

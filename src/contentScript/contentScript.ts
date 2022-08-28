@@ -8,6 +8,15 @@ import {
   getImageUrlOriginal,
 } from "../utils/storage";
 import { checkURL } from "../utils/checkUrl";
+const myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+myHeaders.append("sec-fetch-site", "cross-site");
+myHeaders.append("referer", "https://www.pixiv.net/");
+const requestOptions = {
+  method: "GET",
+  headers: myHeaders,
+};
+
 function downloadImage(url: string) {
   return new Promise((resolve, reject) => {
     fetch(url, {
@@ -102,8 +111,30 @@ setInterval(() => {
 }, 1000);
 
 getImageUrl().then((res) => {
-  if (res) {
-    downloadImage(res);
+  if (res.length > 0) {
+    fetch(res, requestOptions).then((response) => {
+      if (response.status == 404) {
+        const newUrlToFetch = response.url.replace(".jpg", ".png");
+        return fetch(newUrlToFetch, requestOptions);
+      } else {
+        return response;
+      }
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `pixiv-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .then(() => {
+        chrome.runtime.sendMessage({ notification: "Close" });
+      })
+      .catch((e) => console.log(e));
   }
 });
 

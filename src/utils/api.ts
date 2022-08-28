@@ -29,7 +29,9 @@ export class API {
     
         fetch(url,  {
           method: 'get',
-          credentials: 'same-origin'})
+          credentials: 'same-origin'
+        }
+          )
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -67,6 +69,25 @@ export class API {
   }
   static getAllArtworks(id: string): Promise<any> {
     const url = `https://www.pixiv.net/ajax/user/${id}/profile/all`;
-    return this.sendGetRequest(url);
-  }
+    return  new Promise((resolve, reject) => {
+    
+      fetch(url, requestOptions)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          reject({
+            status: response.status,
+            statusText: response.statusText,
+          });
+        }
+      })
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  })
+}
 }

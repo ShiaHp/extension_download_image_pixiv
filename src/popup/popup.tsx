@@ -1,26 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import {
-  InputBase,
-  IconButton,
-  Paper,
-  Box,
-  Grid,
-  Typography,
-  Button,
-} from "@material-ui/core";
-import axios from "axios";
-import { ImageList, ImageListItem } from "@mui/material";
-import { Add as AddIcon, LeakRemoveTwoTone } from "@material-ui/icons";
+import { InputBase, Box, Grid, Typography, Button } from "@material-ui/core";
 import Info from "../popup/Info/Info";
-import UserInfo from "../popup/Info/index";
-import {
-  setStoredSingle,
-  getStoredSingle,
-  setImageUrlStorage,
-  setIDArtistStorage,
-  getIDArtistStorage,
-} from "../utils/storage";
+import { getStoredSingle, setIDArtistStorage } from "../utils/storage";
 import { API, ArtworkData } from "../utils/api";
 import "./popup.css";
 
@@ -35,6 +17,7 @@ const App: React.FC<{}> = () => {
   const [tab, setTab] = useState<number | string>();
   const [dataInfo, setDataInfo] = useState<Array<number>>([]);
   const [imagePreview, setImagePreview] = useState<Array<string>>([]);
+  const [illusts, setIllusts] = useState<string[] | []>([]);
 
   useEffect(() => {
     getStoredSingle().then((idSingle) => {
@@ -43,11 +26,41 @@ const App: React.FC<{}> = () => {
   }, []);
 
   const handleInputButtonclick = async () => {
-    const updateIdArtist = idInput;
-    setIDArtistStorage(updateIdArtist).then(() => {
-      setIdInput("");
-      setIdArtist(updateIdArtist);
+    const updateIdArtist = idArtist;
+    await API.getAllArtworks(updateIdArtist).then((data) => {
+      setIllusts(data.body.illusts);
     });
+
+    const arrUrl = Object.keys(illusts);
+    const result1 = [];
+
+    if (arrUrl.length > 0) {
+      chrome.storage.local.get({ userKeyIds: [] }, function (result) {
+        var userKeyIds = result.userKeyIds;
+        userKeyIds.push({ keyPairId: arrUrl, HasBeenUploadedYet: false });
+        chrome.storage.local.set({ userKeyIds: userKeyIds }, function () {
+          chrome.storage.local.get("userKeyIds", async function (result) {
+            const response = result.userKeyIds[0].keyPairId.map((item) => {
+              return API.getArtwordData(item);
+            });
+            await Promise.all(response).then((files) => {
+              files.forEach((file) => {
+                result1.push(file.body.urls.original);
+              });
+            });
+
+            chrome.storage.local.set({ arrUrl1: result1 }, () => {
+              chrome.tabs.query(
+                { active: true, currentWindow: true },
+                function (tabs) {
+                  chrome.tabs.reload(tabs[0].id);
+                }
+              );
+            });
+          });
+        });
+      });
+    }
   };
   chrome.storage.local.set({
     item: imageUrl,
@@ -66,7 +79,9 @@ const App: React.FC<{}> = () => {
     await API.getBookMarkOfUser(idArtist, "illusts", offset * 48, limit).then(
       (data) => {
         data.body.works.map((item) => {
-          arrUrl.push(item.id);
+          if (item.isMasked === false) {
+            arrUrl.push(item.id);
+          }
         });
         const result1 = [];
         if (arrUrl.length > 0) {
@@ -78,11 +93,16 @@ const App: React.FC<{}> = () => {
                 const response = result.userKeyIds[0].keyPairId.map((item) => {
                   return API.getArtwordData(item);
                 });
-                await Promise.all(response).then((files) => {
-                  files.forEach((file) => {
-                    result1.push(file.body.urls.original);
+
+                await Promise.all(response)
+                  .then((files) => {
+                    files.forEach((file) => {
+                      result1.push(file.body.urls.original);
+                    });
+                  })
+                  .catch(function (err) {
+                    console.log(err.message);
                   });
-                });
 
                 chrome.storage.local.set({ arrUrl1: result1 }, () => {
                   chrome.tabs.query(
@@ -99,7 +119,6 @@ const App: React.FC<{}> = () => {
       }
     );
   };
-
 
   chrome.runtime.sendMessage({ notification: "download" }, () => {
     chrome.runtime.onMessage.addListener(function (request) {
@@ -121,7 +140,7 @@ const App: React.FC<{}> = () => {
             }}
           />
           <Button onClick={handleInputButtonclick}>
-            Download image from this artist
+            Download image from this artist. (click 2 time to download )
           </Button>
         </Grid>
         <Grid item>
@@ -156,7 +175,6 @@ const App: React.FC<{}> = () => {
             Download image from your bookmarks
           </Button>
         </Grid>
-  
       </Grid>
     </Box>
   );

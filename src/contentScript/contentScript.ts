@@ -8,7 +8,6 @@ import {
   getImageUrlOriginal,
 } from "../utils/storage";
 import { checkURL } from "../utils/checkUrl";
-
 function downloadImage(url: string) {
   return new Promise((resolve, reject) => {
     fetch(url, {
@@ -37,7 +36,12 @@ function downloadImage(url: string) {
         a.click();
         URL.revokeObjectURL(url);
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log(e);
+        alert("Please one more time。ありがとうございました。");
+    
+        chrome.runtime.sendMessage({ notification: `reload-extension"`});
+      });
   });
 }
 

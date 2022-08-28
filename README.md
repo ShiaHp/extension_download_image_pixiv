@@ -9,15 +9,12 @@
   - Fix bug cannot download image end with '.jpg' replace by '.png' : ✅ 
   - Download all image from bookmarks user: ✅
   - Adding icon to download image : ✅
-  - Download image from recommended data
-  - Adding image to bookmarks
-    - Fix bug CORS : ( căng cực 😂)
+  - Fix bug CORS : ( căng cực 😂)
+  - Fix error cannot download multiple images from bookmarks user (Quá lườiiiiiiiiiiiiiiiii :<)
 <<<<<<< HEAD
 
 =======
-  - Fix bug relate to art deleted
-  - Download manga
-  - Download novel
+  - Fix bug relate to art deleted : ✅
 >>>>>>> 35b3d50053d2c5d9e72f3267e4b7d7598f755067
   
 

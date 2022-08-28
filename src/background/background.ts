@@ -142,8 +142,15 @@ chrome.runtime.onMessage.addListener(function (request) {
       }
     );
   }
+  if(request.notification === "reload-extension"){
+    chrome.runtime.requestUpdateCheck(
+      () =>{
+        chrome.runtime.reload();
+      }
+    )
+  }
 });
 
 
- 
+
     

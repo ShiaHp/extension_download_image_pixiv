@@ -4,7 +4,7 @@ export interface LocalStorage {
   imgUrl?: string;
   idArtist?: string;
   arrUrl?: Array<string>;
-  imgUrlOriginal? : string;
+  imgUrlOriginal?: string;
 }
 export interface LocalStorageOptions {
   userDefault: string;
@@ -67,11 +67,10 @@ export function getImageUrl(): Promise<string> {
   });
 }
 
-export function clearImageUrl(): Promise<void> {
-  const keys: LocalStorageKeys = "imgUrl";
-  return new Promise(() => {
-    chrome.storage.local.clear();
-  });
+export function clearImageUrl(): void {
+
+  chrome.storage.local.clear()
+
 }
 
 export function setIDArtistStorage(idArtist: string): Promise<void> {

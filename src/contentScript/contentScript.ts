@@ -9,7 +9,7 @@ import {
 } from "../utils/storage";
 import { checkURL } from "../utils/checkUrl";
 const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
+
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
 const requestOptions = {
@@ -18,23 +18,13 @@ const requestOptions = {
 };
 
 function downloadImage(url: string) {
+
   return new Promise((resolve, reject) => {
     fetch(url, {
       method: "get",
-      credentials: "same-origin"
-    })
-      .then((response) => {
-        if (response.status == 404) {
-          const newUrlToFetch = response.url.replace(".jpg", ".png");
-          return fetch(newUrlToFetch, {
-            method: "get",
-            credentials: "same-origin",
-          });
-        } else {
-          return response;
-        }
-      })
-      .then((response) => response.blob())
+      credentials: "same-origin",
+      headers: myHeaders,
+    })  .then((response) => response.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -46,9 +36,8 @@ function downloadImage(url: string) {
         URL.revokeObjectURL(url);
       })
       .catch((e) => {
-        console.log(e);
-        alert("Please one more time。ありがとうございました。");
-    
+        reject(e);
+        alert("Please click one more time。ありがとうございました。");
         chrome.runtime.sendMessage({ notification: `reload-extension"`});
       });
   });
@@ -85,11 +74,11 @@ setInterval(() => {
       async function DownloadImage(url: string) {
         const count = await checkURL.checkManyPageCount(url);
         if (count <= 1) {
-          const newUrl: any = checkURL.checkURLmedium(url);
+          const newUrl: any = await checkURL.checkURLmedium(url);
 
           downloadImage(newUrl);
         } else {
-          const newUrl: any = checkURL.checkURLmedium(url);
+          const newUrl: any =await checkURL.checkURLmedium(url);
           for (let i = 0; i < count; i++) {
             const url = `${newUrl}`.replace("_p0", `_p${i}`);
             downloadImage(url);
@@ -109,6 +98,11 @@ setInterval(() => {
     }
   }
 }, 1000);
+
+
+// <div id="status">&nbsp;</div>
+// <h1 id="progress">&nbsp;</h1>
+// <img id="img" />
 
 getImageUrl().then((res) => {
   if (res.length > 0) {

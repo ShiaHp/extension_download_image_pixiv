@@ -36,8 +36,9 @@ function downloadImage(url: string) {
         URL.revokeObjectURL(url);
       })
       .catch((e) => {
-        reject(e);
-        alert("Please click one more time。ありがとうございました。");
+        console.log(e)
+        downloadImage(url)
+        resolve(e);
         chrome.runtime.sendMessage({ notification: `reload-extension"`});
       });
   });

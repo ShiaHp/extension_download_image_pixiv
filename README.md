@@ -3,7 +3,7 @@
 <<<<<<< HEAD
 
 
-- TO DO :
+- TO DO (やった終わりました. もうコーディングしたくない.眠い ) : 
   - Download image from artist and get the current url of artist : ✅
   - Download image from click icon on pixiv artworks : ✅
   - Fix bug cannot download image end with '.jpg' replace by '.png' : ✅ 
@@ -15,6 +15,7 @@
 
 =======
   - Fix bug relate to art deleted : ✅
+  
 >>>>>>> 35b3d50053d2c5d9e72f3267e4b7d7598f755067
   
 

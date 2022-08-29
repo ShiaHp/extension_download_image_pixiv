@@ -40,6 +40,11 @@ export function setImageUrlStorage(imgUrl: string): Promise<void> {
   });
 }
 
+
+
+
+
+
 export function setImageUrlOriginalStorage(imgUrlOriginal: string): Promise<void> {
   const vals: LocalStorage = {
     imgUrlOriginal,

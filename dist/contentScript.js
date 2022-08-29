@@ -101,6 +101,7 @@ class API {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "idReg": () => (/* binding */ idReg),
 /* harmony export */   "checkURL": () => (/* binding */ checkURL)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
@@ -304,8 +305,9 @@ var __webpack_exports__ = {};
   !*** ./src/contentScript/contentScript.ts ***!
   \********************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/storage */ "./src/utils/storage.ts");
-/* harmony import */ var _utils_checkUrl__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/checkUrl */ "./src/utils/checkUrl.ts");
+/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/api */ "./src/utils/api.ts");
+/* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/storage */ "./src/utils/storage.ts");
+/* harmony import */ var _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/checkUrl */ "./src/utils/checkUrl.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -315,6 +317,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 const myHeaders = new Headers();
@@ -349,7 +352,27 @@ function downloadImage(url) {
         });
     });
 }
+let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
+const button1 = document.createElement("button");
+button1.innerHTML = "Download all";
+button1.style.zIndex = "9999";
+button1.style.backgroundColor = "#52e010";
+button1.style.borderRadius = "5px";
+button1.style.fontSize = "18px";
+button1.style.alignContent = "center";
+button1.style.color = " #fff";
+button1.style.position = "fixed";
+button1.style.right = "0";
+button1.style.bottom = "350px";
+button1.style.padding = "0.5rem";
+button1.style.margin = "0.5rem 0.5rem 0.5rem 0";
+button1.style.transition = "0.2s all";
+button1.style.cursor = "pointer";
+button1.style.transform = "scale(0.98)";
+button1.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+const body = document.getElementsByTagName("body")[0];
+body.appendChild(button1);
 let linkImg = "";
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
@@ -357,6 +380,18 @@ setInterval(() => {
             imagesArray[i].parentElement &&
             imagesArray[i].parentElement.childNodes &&
             imagesArray[i].parentElement.childNodes.length <= 1) {
+            const checkbox = document.createElement('input');
+            checkbox.type = "checkbox";
+            checkbox.id = "checkbox";
+            checkbox.style.fontSize = "20px";
+            checkbox.style.position = "absolute";
+            checkbox.style.borderRadius = "5px";
+            checkbox.style.zIndex = "9998";
+            checkbox.style.top = "0px";
+            checkbox.style.left = "0px";
+            checkbox.style.height = "25px";
+            checkbox.style.width = "25px";
+            checkbox.style.backgroundColor = "rgba(255, 255, 255, 0.5rem)";
             const button = document.createElement("button");
             button.innerText = "\u21E9";
             button.style.zIndex = "9999";
@@ -374,15 +409,15 @@ setInterval(() => {
             button.style.cursor = "pointer";
             button.style.transform = "scale(0.98)";
             button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
-            function DownloadImage(url) {
+            function checkImage(url) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const count = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_1__.checkURL.checkManyPageCount(url);
+                    const count = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkManyPageCount(url);
                     if (count <= 1) {
-                        const newUrl = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_1__.checkURL.checkURLmedium(url);
+                        const newUrl = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkURLmedium(url);
                         downloadImage(newUrl);
                     }
                     else {
-                        const newUrl = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_1__.checkURL.checkURLmedium(url);
+                        const newUrl = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkURLmedium(url);
                         for (let i = 0; i < count; i++) {
                             const url = `${newUrl}`.replace("_p0", `_p${i}`);
                             downloadImage(url);
@@ -390,22 +425,49 @@ setInterval(() => {
                     }
                 });
             }
+            checkbox.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const id = e.path[1].innerHTML.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.idReg)[0];
+                // check if the id is already in array
+                if (imgIdArr.includes(id)) {
+                    const index = imgIdArr.indexOf(id);
+                    imgIdArr.splice(index, 1);
+                }
+                else {
+                    imgIdArr.push(id);
+                }
+            });
             imagesArray[i].addEventListener("mouseover", function (e) {
                 linkImg = this.src;
             });
             button.onclick = function (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                DownloadImage(linkImg);
+                checkImage(linkImg);
             };
             imagesArray[i].parentElement.appendChild(button);
+            imagesArray[i].parentElement.appendChild(checkbox);
         }
     }
 }, 1000);
-// <div id="status">&nbsp;</div>
-// <h1 id="progress">&nbsp;</h1>
-// <img id="img" />
-(0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.getImageUrl)().then((res) => {
+button1.addEventListener("click", function (e) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // const data = await API.getArtwordData(id);
+        const urlArr = [];
+        for (let i = 0; i < imgIdArr.length; i++) {
+            const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(imgIdArr[i]);
+            urlArr.push(data.body.urls.original);
+        }
+        const response = urlArr.map((url) => {
+            return downloadImage(url);
+        });
+        yield Promise.all(response).then(() => {
+            imgIdArr = [];
+            document.getElementById("checkbox")[0].checked = false;
+        });
+    });
+});
+(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrl)().then((res) => {
     if (res.length > 0) {
         fetch(res, requestOptions).then((response) => {
             if (response.status == 404) {
@@ -433,7 +495,7 @@ setInterval(() => {
             .catch((e) => console.log(e));
     }
 });
-(0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.getImageUrlOriginal)().then((res) => {
+(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => {
     if (res.length > 0) {
         fetch(res, {
             method: "get",
@@ -480,7 +542,7 @@ chrome.storage.local.get("arrUrl", function (res) {
         }
     });
 });
-(0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.clearImageUrl)();
+(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.clearImageUrl)();
 
 })();
 

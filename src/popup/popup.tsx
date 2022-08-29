@@ -23,6 +23,7 @@ const App: React.FC<{}> = () => {
     getStoredSingle().then((idSingle) => {
       setIdSingle(idSingle);
     });
+   
   }, []);
 
   const handleInputButtonclick = async () => {

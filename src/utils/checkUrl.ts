@@ -1,6 +1,6 @@
 import { API } from "./api";
 
-const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
+export const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
 
 export class checkURL {
   static async checkManyPageCount(url: string) {

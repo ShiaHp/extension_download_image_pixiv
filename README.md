@@ -11,6 +11,7 @@
   - Adding icon to download image : ✅
   - Fix bug CORS : ( căng cực 😂)
   - Fix error cannot download multiple images from bookmarks user (Quá lườiiiiiiiiiiiiiiiii :<)
+  - adding checkbox,icon to download all artwork  : ✅
 <<<<<<< HEAD
 
 =======

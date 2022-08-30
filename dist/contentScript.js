@@ -117,23 +117,21 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
 class checkURL {
-    static checkManyPageCount(url) {
+    static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = url.match(idReg)[0];
             const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(id);
-            if (data.body.pageCount <= 1) {
-                return data.body.pageCount;
-            }
-            else {
-                return data.body.pageCount;
-            }
+            return data;
+        });
+    }
+    static checkManyPageCount(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.getDatafromRequest(url).then((data) => data.body.pageCount);
         });
     }
     static checkURLmedium(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = url.match(idReg)[0];
-            const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(id);
-            return data.body.urls.original;
+            return this.getDatafromRequest(url).then((data) => data.body.urls.original);
         });
     }
 }
@@ -333,7 +331,8 @@ function downloadImage(url) {
             method: "get",
             credentials: "same-origin",
             headers: myHeaders,
-        }).then((response) => response.blob())
+        })
+            .then((response) => response.blob())
             .then((blob) => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -354,25 +353,25 @@ function downloadImage(url) {
 }
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
-const button1 = document.createElement("button");
-button1.innerHTML = "Download all";
-button1.style.zIndex = "9999";
-button1.style.backgroundColor = "#52e010";
-button1.style.borderRadius = "5px";
-button1.style.fontSize = "18px";
-button1.style.alignContent = "center";
-button1.style.color = " #fff";
-button1.style.position = "fixed";
-button1.style.right = "0";
-button1.style.bottom = "350px";
-button1.style.padding = "0.5rem";
-button1.style.margin = "0.5rem 0.5rem 0.5rem 0";
-button1.style.transition = "0.2s all";
-button1.style.cursor = "pointer";
-button1.style.transform = "scale(0.98)";
-button1.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+const buttonDownloadAll = document.createElement("button");
+buttonDownloadAll.innerHTML = "Download all";
+buttonDownloadAll.style.zIndex = "9999";
+buttonDownloadAll.style.backgroundColor = "#52e010";
+buttonDownloadAll.style.borderRadius = "5px";
+buttonDownloadAll.style.fontSize = "18px";
+buttonDownloadAll.style.alignContent = "center";
+buttonDownloadAll.style.color = " #fff";
+buttonDownloadAll.style.position = "fixed";
+buttonDownloadAll.style.right = "0";
+buttonDownloadAll.style.bottom = "350px";
+buttonDownloadAll.style.padding = "0.5rem";
+buttonDownloadAll.style.margin = "0.5rem 0.5rem 0.5rem 0";
+buttonDownloadAll.style.transition = "0.2s all";
+buttonDownloadAll.style.cursor = "pointer";
+buttonDownloadAll.style.transform = "scale(0.98)";
+buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
-body.appendChild(button1);
+body.appendChild(buttonDownloadAll);
 let linkImg = "";
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
@@ -380,7 +379,7 @@ setInterval(() => {
             imagesArray[i].parentElement &&
             imagesArray[i].parentElement.childNodes &&
             imagesArray[i].parentElement.childNodes.length <= 1) {
-            const checkbox = document.createElement('input');
+            const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.id = "checkbox";
             checkbox.style.fontSize = "20px";
@@ -408,6 +407,7 @@ setInterval(() => {
             button.style.transition = "0.2s all";
             button.style.cursor = "pointer";
             button.style.transform = "scale(0.98)";
+            button.style.opacity = "0.5rem";
             button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
             function checkImage(url) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -425,7 +425,7 @@ setInterval(() => {
                     }
                 });
             }
-            checkbox.addEventListener('click', function (e) {
+            checkbox.addEventListener("click", function (e) {
                 e.stopPropagation();
                 const id = e.path[1].innerHTML.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.idReg)[0];
                 // check if the id is already in array
@@ -450,26 +450,38 @@ setInterval(() => {
         }
     }
 }, 1000);
-button1.addEventListener("click", function (e) {
+buttonDownloadAll.addEventListener("click", function (e) {
     return __awaiter(this, void 0, void 0, function* () {
-        // const data = await API.getArtwordData(id);
-        const urlArr = [];
-        for (let i = 0; i < imgIdArr.length; i++) {
-            const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(imgIdArr[i]);
-            urlArr.push(data.body.urls.original);
+        if (imgIdArr.length > 0) {
+            const urlArr = [];
+            const isAllCheck = false;
+            Array.from(document.querySelectorAll("input[type=checkbox]")).forEach((el) => (el.checked = isAllCheck));
+            for (let i = 0; i < imgIdArr.length; i++) {
+                const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(imgIdArr[i]);
+                if (data.body.pageCount <= 1) {
+                    urlArr.push(data.body.urls.original);
+                }
+                else {
+                    for (let i = 0; i < data.body.pageCount; i++) {
+                        const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+                        urlArr.push(url);
+                    }
+                }
+            }
+            const response = urlArr.map((url) => {
+                return downloadImage(url);
+            });
+            yield Promise.all(response).then(() => { imgIdArr = []; });
         }
-        const response = urlArr.map((url) => {
-            return downloadImage(url);
-        });
-        yield Promise.all(response).then(() => {
-            imgIdArr = [];
-            document.getElementById("checkbox")[0].checked = false;
-        });
+        else {
+            alert("Please select artworks");
+        }
     });
 });
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrl)().then((res) => {
     if (res.length > 0) {
-        fetch(res, requestOptions).then((response) => {
+        fetch(res, requestOptions)
+            .then((response) => {
             if (response.status == 404) {
                 const newUrlToFetch = response.url.replace(".jpg", ".png");
                 return fetch(newUrlToFetch, requestOptions);

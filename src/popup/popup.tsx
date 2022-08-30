@@ -23,7 +23,6 @@ const App: React.FC<{}> = () => {
     getStoredSingle().then((idSingle) => {
       setIdSingle(idSingle);
     });
-   
   }, []);
 
   const handleInputButtonclick = async () => {
@@ -33,7 +32,7 @@ const App: React.FC<{}> = () => {
     });
 
     const arrUrl = Object.keys(illusts);
-    const result1 = [];
+    const imgList = [];
 
     if (arrUrl.length > 0) {
       chrome.storage.local.get({ userKeyIds: [] }, function (result) {
@@ -46,11 +45,19 @@ const App: React.FC<{}> = () => {
             });
             await Promise.all(response).then((files) => {
               files.forEach((file) => {
-                result1.push(file.body.urls.original);
+                if (file.body.pageCount <= 1) {
+                 imgList.push(file.body.urls.original);
+                } else {
+                  for (let i = 0; i < file.body.pageCount; i++) {
+                    const url = `${file.body.urls.original}`.replace("_p0", `_p${i}`);
+                   imgList.push(url);
+                  }
+                }
+            
               });
             });
 
-            chrome.storage.local.set({ arrUrl1: result1 }, () => {
+            chrome.storage.local.set({ arrUrl1: imgList }, () => {
               chrome.tabs.query(
                 { active: true, currentWindow: true },
                 function (tabs) {
@@ -98,7 +105,14 @@ const App: React.FC<{}> = () => {
                 await Promise.all(response)
                   .then((files) => {
                     files.forEach((file) => {
-                      result1.push(file.body.urls.original);
+                      if (file.body.pageCount <= 1) {
+                        result1.push(file.body.urls.original);
+                       } else {
+                         for (let i = 0; i < file.body.pageCount; i++) {
+                           const url = `${file.body.urls.original}`.replace("_p0", `_p${i}`);
+                          result1.push(url);
+                         }
+                       }
                     });
                   })
                   .catch(function (err) {

@@ -1,15 +1,10 @@
 import { API } from "../utils/api";
 import {
-  setStoredSingle,
-  getStoredSingle,
   getImageUrl,
-  setImageUrlStorage,
   clearImageUrl,
   getImageUrlOriginal,
-
 } from "../utils/storage";
 import { checkURL, idReg } from "../utils/checkUrl";
-import { checkboxClasses } from "@mui/material";
 
 
 const myHeaders = new Headers();
@@ -22,13 +17,13 @@ const requestOptions = {
 };
 
 function downloadImage(url: string) {
-
   return new Promise((resolve, reject) => {
     fetch(url, {
       method: "get",
       credentials: "same-origin",
       headers: myHeaders,
-    }).then((response) => response.blob())
+    })
+      .then((response) => response.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -40,34 +35,34 @@ function downloadImage(url: string) {
         URL.revokeObjectURL(url);
       })
       .catch((e) => {
-        console.log(e)
-        downloadImage(url)
+        console.log(e);
+        downloadImage(url);
         resolve(e);
         chrome.runtime.sendMessage({ notification: `reload-extension"` });
       });
   });
 }
-let imgIdArr = []
+let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
-const button1 = document.createElement("button");
-button1.innerHTML = "Download all";
-button1.style.zIndex = "9999";
-button1.style.backgroundColor = "#52e010";
-button1.style.borderRadius = "5px";
-button1.style.fontSize = "18px";
-button1.style.alignContent = "center";
-button1.style.color = " #fff";
-button1.style.position = "fixed";
-button1.style.right = "0";
-button1.style.bottom = "350px";
-button1.style.padding = "0.5rem";
-button1.style.margin = "0.5rem 0.5rem 0.5rem 0";
-button1.style.transition = "0.2s all";
-button1.style.cursor = "pointer";
-button1.style.transform = "scale(0.98)";
-button1.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+const buttonDownloadAll = document.createElement("button");
+buttonDownloadAll.innerHTML = "Download all";
+buttonDownloadAll.style.zIndex = "9999";
+buttonDownloadAll.style.backgroundColor = "#52e010";
+buttonDownloadAll.style.borderRadius = "5px";
+buttonDownloadAll.style.fontSize = "18px";
+buttonDownloadAll.style.alignContent = "center";
+buttonDownloadAll.style.color = " #fff";
+buttonDownloadAll.style.position = "fixed";
+buttonDownloadAll.style.right = "0";
+buttonDownloadAll.style.bottom = "350px";
+buttonDownloadAll.style.padding = "0.5rem";
+buttonDownloadAll.style.margin = "0.5rem 0.5rem 0.5rem 0";
+buttonDownloadAll.style.transition = "0.2s all";
+buttonDownloadAll.style.cursor = "pointer";
+buttonDownloadAll.style.transform = "scale(0.98)";
+buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
-body.appendChild(button1);
+body.appendChild(buttonDownloadAll);
 let linkImg = "";
 
 setInterval(() => {
@@ -78,13 +73,9 @@ setInterval(() => {
       imagesArray[i].parentElement.childNodes &&
       imagesArray[i].parentElement.childNodes.length <= 1
     ) {
-
-
-
-      const checkbox = document.createElement('input');
+      const checkbox = document.createElement("input")
       checkbox.type = "checkbox";
       checkbox.id = "checkbox";
-
 
       checkbox.style.fontSize = "20px";
       checkbox.style.position = "absolute";
@@ -95,9 +86,6 @@ setInterval(() => {
       checkbox.style.height = "25px";
       checkbox.style.width = "25px";
       checkbox.style.backgroundColor = "rgba(255, 255, 255, 0.5rem)";
-
-
-
 
       const button = document.createElement("button");
       button.innerText = "\u21E9";
@@ -115,7 +103,10 @@ setInterval(() => {
       button.style.transition = "0.2s all";
       button.style.cursor = "pointer";
       button.style.transform = "scale(0.98)";
+      button.style.opacity = "0.5rem";
+
       button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+
       async function checkImage(url: string) {
         const count = await checkURL.checkManyPageCount(url);
         if (count <= 1) {
@@ -131,19 +122,18 @@ setInterval(() => {
         }
       }
 
-      checkbox.addEventListener('click', function (e) {
+      checkbox.addEventListener("click", function (e) {
         e.stopPropagation();
-        const id = e.path[1].innerHTML.match(idReg)[0];
+
+        const id = e.path[1].innerHTML.match(idReg)[0]
         // check if the id is already in array
         if (imgIdArr.includes(id)) {
           const index = imgIdArr.indexOf(id);
-          imgIdArr.splice(index, 1)
+          imgIdArr.splice(index, 1);
         } else {
           imgIdArr.push(id);
         }
-
-
-      })
+      });
 
       imagesArray[i].addEventListener("mouseover", function (e) {
         linkImg = this.src;
@@ -160,36 +150,50 @@ setInterval(() => {
   }
 }, 1000);
 
-button1.addEventListener("click", async function (e) {
+buttonDownloadAll.addEventListener("click", async function (e) {
+  if (imgIdArr.length > 0) {
+    const urlArr = [];
 
-  // const data = await API.getArtwordData(id);
-  const urlArr = []
-  for (let i = 0; i < imgIdArr.length; i++) {
-    const data = await API.getArtwordData(imgIdArr[i])
-    urlArr.push(data.body.urls.original)
+    const isAllCheck = false;
+    Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
+      (el) => (el.checked = isAllCheck)
+    );
+    for (let i = 0; i < imgIdArr.length; i++) {
+
+      const data = await API.getArtwordData(imgIdArr[i]);
+      if (data.body.pageCount <= 1) {
+        urlArr.push(data.body.urls.original);
+      } else {
+        for (let i = 0; i < data.body.pageCount; i++) {
+          const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+          urlArr.push(url);
+        }
+      }
+
+    }
+    const response = urlArr.map((url) => {
+      return downloadImage(url);
+    });
+
+    await Promise.all(response).then(() => { imgIdArr = [] });
+
+
+  } else {
+    alert("Please select artworks");
   }
-  const response = urlArr.map((url) => {
-    return downloadImage(url)
-  })
-
-  await Promise.all(response).then(() => {
-    imgIdArr = [];
-    document.getElementById("checkbox")[0].checked = false
-  });
-
-
-})
+});
 
 getImageUrl().then((res) => {
   if (res.length > 0) {
-    fetch(res, requestOptions).then((response) => {
-      if (response.status == 404) {
-        const newUrlToFetch = response.url.replace(".jpg", ".png");
-        return fetch(newUrlToFetch, requestOptions);
-      } else {
-        return response;
-      }
-    })
+    fetch(res, requestOptions)
+      .then((response) => {
+        if (response.status == 404) {
+          const newUrlToFetch = response.url.replace(".jpg", ".png");
+          return fetch(newUrlToFetch, requestOptions);
+        } else {
+          return response;
+        }
+      })
       .then((response) => response.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);

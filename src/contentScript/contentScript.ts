@@ -44,6 +44,11 @@ function downloadImage(url: string) {
 }
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
+let myImage = document.createElement('img') as HTMLImageElement || string;
+myImage.style.borderRadius = '5px';
+myImage.style.border = '1px solid black';
+myImage.style.padding = '5px';
+myImage.style.width = "150px"
 const buttonDownloadAll = document.createElement("button");
 buttonDownloadAll.innerHTML = "Download all";
 buttonDownloadAll.style.zIndex = "9999";
@@ -64,7 +69,7 @@ buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
 let linkImg = "";
-
+const liArr = []
 setInterval(() => {
   for (let i = 2; i < imagesArray.length; i++) {
     if (
@@ -73,6 +78,20 @@ setInterval(() => {
       imagesArray[i].parentElement.childNodes &&
       imagesArray[i].parentElement.childNodes.length <= 1
     ) {
+      // const tab = document.getElementsByTagName('li')
+
+      // if (tab[i].className.includes("sc-9y4be5-2")) {
+      //   liArr.push(tab[i].className.includes("sc-9y4be5-2"))
+      // }
+
+
+
+
+
+
+
+
+
       const checkbox = document.createElement("input")
       checkbox.type = "checkbox";
       checkbox.id = "checkbox";
@@ -136,6 +155,7 @@ setInterval(() => {
       });
 
       imagesArray[i].addEventListener("mouseover", function (e) {
+        myImage.src = this.src;
         linkImg = this.src;
       });
 
@@ -146,9 +166,12 @@ setInterval(() => {
       };
       imagesArray[i].parentElement.appendChild(button);
       imagesArray[i].parentElement.appendChild(checkbox);
+
     }
   }
-}, 1000);
+}, 100);
+
+console.log(liArr)
 
 buttonDownloadAll.addEventListener("click", async function (e) {
   if (imgIdArr.length > 0) {
@@ -242,11 +265,11 @@ chrome.storage.local.get("arrUrl1", async function (res) {
       return downloadImage(url);
     });
 
-    await Promise.all(response).then((files) => {
-      console.log(files);
-    });
-  }
-});
+    await Promise.all(response)
+    
+
+
+  });
 
 chrome.storage.local.get("arrUrl", async function (res) {
   if (res || res.arrUrl.length > 0) {
@@ -258,5 +281,6 @@ chrome.storage.local.get("arrUrl", async function (res) {
     });
   }
 });
+
 
 clearImageUrl();

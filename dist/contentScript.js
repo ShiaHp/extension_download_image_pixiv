@@ -353,6 +353,11 @@ function downloadImage(url) {
 }
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
+let myImage = document.createElement('img') || string;
+myImage.style.borderRadius = '5px';
+myImage.style.border = '1px solid black';
+myImage.style.padding = '5px';
+myImage.style.width = "150px";
 const buttonDownloadAll = document.createElement("button");
 buttonDownloadAll.innerHTML = "Download all";
 buttonDownloadAll.style.zIndex = "9999";
@@ -373,12 +378,17 @@ buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
 let linkImg = "";
+const liArr = [];
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
         if (imagesArray.length > 2 &&
             imagesArray[i].parentElement &&
             imagesArray[i].parentElement.childNodes &&
             imagesArray[i].parentElement.childNodes.length <= 1) {
+            // const tab = document.getElementsByTagName('li')
+            // if (tab[i].className.includes("sc-9y4be5-2")) {
+            //   liArr.push(tab[i].className.includes("sc-9y4be5-2"))
+            // }
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.id = "checkbox";
@@ -438,6 +448,7 @@ setInterval(() => {
                 }
             });
             imagesArray[i].addEventListener("mouseover", function (e) {
+                myImage.src = this.src;
                 linkImg = this.src;
             });
             button.onclick = function (e) {
@@ -449,7 +460,8 @@ setInterval(() => {
             imagesArray[i].parentElement.appendChild(checkbox);
         }
     }
-}, 1000);
+}, 100);
+console.log(liArr);
 buttonDownloadAll.addEventListener("click", function (e) {
     return __awaiter(this, void 0, void 0, function* () {
         if (imgIdArr.length > 0) {
@@ -536,9 +548,7 @@ chrome.storage.local.get("arrUrl1", function (res) {
             const response = res.arrUrl1.map((url) => {
                 return downloadImage(url);
             });
-            yield Promise.all(response).then((files) => {
-                console.log(files);
-            });
+            yield Promise.all(response);
         }
     });
 });

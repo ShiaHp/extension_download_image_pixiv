@@ -1,14 +1,15 @@
+import { idReg } from "./../utils/checkUrl";
 // TODO: background script
 import {
   setStoredSingle,
   getStoredSingle,
   getImageUrl,
   setImageUrlStorage,
-  setImageUrlOriginalStorage
+  setImageUrlOriginalStorage,
 } from "../utils/storage";
 import { API } from "../utils/api";
-
-const regex = /access-control-allow-origin/i
+import { checkURL } from "../utils/checkUrl";
+const regex = /access-control-allow-origin/i;
 
 function removeMatchingHeaders(
   headers: chrome.webRequest.HttpHeader[],
@@ -16,8 +17,8 @@ function removeMatchingHeaders(
 ) {
   for (let i = 0, header; (header = headers[i]); i++) {
     if (header.name.match(regex)) {
-      headers.splice(i, 1)
-      return
+      headers.splice(i, 1);
+      return;
     }
   }
 }
@@ -25,31 +26,57 @@ function removeMatchingHeaders(
 function responseListener(
   details: chrome.webRequest.WebResponseHeadersDetails
 ) {
-  removeMatchingHeaders(details.responseHeaders!, regex)
+  removeMatchingHeaders(details.responseHeaders!, regex);
   details.responseHeaders!.push({
-    name: 'access-control-allow-origin',
-    value: '*',
-  })
+    name: "access-control-allow-origin",
+    value: "*",
+  });
 
-  return { responseHeaders: details.responseHeaders }
+  return { responseHeaders: details.responseHeaders };
 }
 
 chrome.webRequest.onHeadersReceived.addListener(
   responseListener,
   {
-    urls: ['*://*.pximg.net/*', '*://*.pixiv.cat/*'],
+    urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
   },
-  ['blocking', 'responseHeaders', 'extraHeaders']
-)
-
+  ["blocking", "responseHeaders", "extraHeaders"]
+);
 
 const functionDownloadImage = async (id: string) => {
   await API.getArtwordData(id).then((data) => {
-    chrome.tabs.create({
-      active: false,
-      url: data.body.urls.original,
-    });
-    setImageUrlOriginalStorage(data.body.urls.original);
+    if (data.body.pageCount <= 1) {
+      chrome.tabs.create({
+        active: false,
+        url: data.body.urls.original,
+      });
+      setImageUrlOriginalStorage(data.body.urls.original);
+    } else {
+      const imgList = [];
+      for (let i = 0; i < data.body.pageCount; i++) {
+        const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+        imgList.push(url);
+      }
+      chrome.storage.local.set({ arrUrl1: imgList }, () => {
+        chrome.tabs.query({}, () => {
+          chrome.tabs.create(
+            {
+              active: false,
+              url: data.body.urls.original,
+            },
+            function (tab) {
+              let dataTime = 1000;
+              if (data.body.pageCount >= 10) {
+                dataTime = 10000;
+                setTimeout(function () {
+                  chrome.tabs.remove(tab.id);
+                }, dataTime);
+              }
+            }
+          );
+        });
+      });
+    }
   });
 };
 
@@ -60,60 +87,19 @@ chrome.runtime.onInstalled.addListener(() => {
     id: "download-image",
   });
 
-  chrome.contextMenus.onClicked.addListener(async (event) => {
-    const UrlPixiv = `${event.linkUrl}`;
-    const urlPixiv = event.linkUrl.match(/artworks\/(\d{2,15})/);
-    const result = []
-    const resultUrl = urlPixiv === null ? UrlPixiv : urlPixiv[1]
-
-    if (resultUrl.length > 12) {
-      fetch(resultUrl)
-        .then((res) => res.text())
-        .then((html) => {
-          const url = html.match(/https.*?master1200/gm)[2].replace("master", "original").replace("_master1200", "") + ".jpg";
-          chrome.tabs.create({
-            active: false,
-            url: url,
-          });
-          setImageUrlStorage(url);
-        });
-    } else {
-      await API.getArtwordData(resultUrl).then((res) => {
-        //  res.body.pageCount
-        for (let i = 0; i < res.body.pageCount; i++) {
-          const url = `${res.body.urls.original}`.replace('_p0', `_p${i}`)
-          result.push(url)
-          chrome.tabs.create({
-            active: false,
-            url: url,
-          });
-        }
-        chrome.storage.local.set({ arrUrl: result }, () => {
-          console.log(result)
-        })
-      })
-    }
-
-
-  });
+  chrome.contextMenus.onClicked.addListener(async (event) => { });
 });
 
 chrome.contextMenus.onClicked.addListener((event) => {
-  if (event.selectionText.length <= 6) {
-    chrome.tabs.create({
-      url: `https://nhentai.net/g/${event.selectionText.trim()}`,
+  if (event.selectionText) {
+    setStoredSingle(event.selectionText);
+    getStoredSingle().then((idSingle) => {
+      functionDownloadImage(idSingle);
     });
   } else {
-    setStoredSingle(event.selectionText);
-    getStoredSingle().then(async (idSingle) => {
-      await API.getArtwordData(idSingle).then((data) => {
-        chrome.tabs.create({
-          active: false,
-          url: data.body.urls.original,
-        });
-        setImageUrlOriginalStorage(data.body.urls.original);
-      });
-    });
+    const urlPixiv = event.linkUrl.match(idReg)[0];
+
+    functionDownloadImage(urlPixiv);
   }
 });
 
@@ -124,10 +110,8 @@ chrome.runtime.onMessage.addListener(function (request) {
       for (let i = 1; i <= data; i++) {
         chrome.tabs.remove(tabs[tabs.length - i].id);
       }
-
-
-
     });
+
   if (request.notification === "download") {
     chrome.tabs.query(
       { active: true, currentWindow: true },
@@ -135,21 +119,17 @@ chrome.runtime.onMessage.addListener(function (request) {
         if (tabs[0].url.startsWith("https://www.pixiv.net/en/artworks/")) {
           const id = tabs[0].url.split("https://www.pixiv.net/en/artworks/")[1];
           functionDownloadImage(id);
-          chrome.runtime.sendMessage({ notification: "close-window" }, () => {
-
-          });
+          chrome.runtime.sendMessage(
+            { notification: "close-window" },
+            () => { }
+          );
         }
       }
     );
   }
-  if(request.notification === "reload-extension"){
-    chrome.runtime.requestUpdateCheck(
-      () =>{
-        chrome.runtime.reload();
-      }
-    )
+  if (request.notification === "reload-extension") {
+    chrome.runtime.requestUpdateCheck(() => {
+      chrome.runtime.reload();
+    });
   }
 });
-
-
-

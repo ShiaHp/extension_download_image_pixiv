@@ -93,6 +93,52 @@ class API {
 
 /***/ }),
 
+/***/ "./src/utils/checkUrl.ts":
+/*!*******************************!*\
+  !*** ./src/utils/checkUrl.ts ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "idReg": () => (/* binding */ idReg),
+/* harmony export */   "checkURL": () => (/* binding */ checkURL)
+/* harmony export */ });
+/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
+class checkURL {
+    static getDatafromRequest(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = url.match(idReg)[0];
+            const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(id);
+            return data;
+        });
+    }
+    static checkManyPageCount(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.getDatafromRequest(url).then((data) => data.body.pageCount);
+        });
+    }
+    static checkURLmedium(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.getDatafromRequest(url).then((data) => data.body.urls.original);
+        });
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/utils/storage.ts":
 /*!******************************!*\
   !*** ./src/utils/storage.ts ***!
@@ -257,8 +303,9 @@ var __webpack_exports__ = {};
   !*** ./src/background/background.ts ***!
   \**************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/storage */ "./src/utils/storage.ts");
-/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/api */ "./src/utils/api.ts");
+/* harmony import */ var _utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../utils/checkUrl */ "./src/utils/checkUrl.ts");
+/* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/storage */ "./src/utils/storage.ts");
+/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/api */ "./src/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -268,6 +315,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 // TODO: background script
 
 
@@ -283,21 +331,46 @@ function removeMatchingHeaders(headers, regex) {
 function responseListener(details) {
     removeMatchingHeaders(details.responseHeaders, regex);
     details.responseHeaders.push({
-        name: 'access-control-allow-origin',
-        value: '*',
+        name: "access-control-allow-origin",
+        value: "*",
     });
     return { responseHeaders: details.responseHeaders };
 }
 chrome.webRequest.onHeadersReceived.addListener(responseListener, {
-    urls: ['*://*.pximg.net/*', '*://*.pixiv.cat/*'],
-}, ['blocking', 'responseHeaders', 'extraHeaders']);
+    urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
+}, ["blocking", "responseHeaders", "extraHeaders"]);
 const functionDownloadImage = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield _utils_api__WEBPACK_IMPORTED_MODULE_1__.API.getArtwordData(id).then((data) => {
-        chrome.tabs.create({
-            active: false,
-            url: data.body.urls.original,
-        });
-        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.setImageUrlOriginalStorage)(data.body.urls.original);
+    yield _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtwordData(id).then((data) => {
+        if (data.body.pageCount <= 1) {
+            chrome.tabs.create({
+                active: false,
+                url: data.body.urls.original,
+            });
+            (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setImageUrlOriginalStorage)(data.body.urls.original);
+        }
+        else {
+            const imgList = [];
+            for (let i = 0; i < data.body.pageCount; i++) {
+                const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+                imgList.push(url);
+            }
+            chrome.storage.local.set({ arrUrl1: imgList }, () => {
+                chrome.tabs.query({}, () => {
+                    chrome.tabs.create({
+                        active: false,
+                        url: data.body.urls.original,
+                    }, function (tab) {
+                        let dataTime = 1000;
+                        if (data.body.pageCount >= 10) {
+                            dataTime = 10000;
+                            setTimeout(function () {
+                                chrome.tabs.remove(tab.id);
+                            }, dataTime);
+                        }
+                    });
+                });
+            });
+        }
     });
 });
 chrome.runtime.onInstalled.addListener(() => {
@@ -306,58 +379,18 @@ chrome.runtime.onInstalled.addListener(() => {
         title: "Download image from that code",
         id: "download-image",
     });
-    chrome.contextMenus.onClicked.addListener((event) => __awaiter(void 0, void 0, void 0, function* () {
-        const UrlPixiv = `${event.linkUrl}`;
-        const urlPixiv = event.linkUrl.match(/artworks\/(\d{2,15})/);
-        const result = [];
-        const resultUrl = urlPixiv === null ? UrlPixiv : urlPixiv[1];
-        if (resultUrl.length > 12) {
-            fetch(resultUrl)
-                .then((res) => res.text())
-                .then((html) => {
-                const url = html.match(/https.*?master1200/gm)[2].replace("master", "original").replace("_master1200", "") + ".jpg";
-                chrome.tabs.create({
-                    active: false,
-                    url: url,
-                });
-                (0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.setImageUrlStorage)(url);
-            });
-        }
-        else {
-            yield _utils_api__WEBPACK_IMPORTED_MODULE_1__.API.getArtwordData(resultUrl).then((res) => {
-                //  res.body.pageCount
-                for (let i = 0; i < res.body.pageCount; i++) {
-                    const url = `${res.body.urls.original}`.replace('_p0', `_p${i}`);
-                    result.push(url);
-                    chrome.tabs.create({
-                        active: false,
-                        url: url,
-                    });
-                }
-                chrome.storage.local.set({ arrUrl: result }, () => {
-                    console.log(result);
-                });
-            });
-        }
-    }));
+    chrome.contextMenus.onClicked.addListener((event) => __awaiter(void 0, void 0, void 0, function* () { }));
 });
 chrome.contextMenus.onClicked.addListener((event) => {
-    if (event.selectionText.length <= 6) {
-        chrome.tabs.create({
-            url: `https://nhentai.net/g/${event.selectionText.trim()}`,
+    if (event.selectionText) {
+        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setStoredSingle)(event.selectionText);
+        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getStoredSingle)().then((idSingle) => {
+            functionDownloadImage(idSingle);
         });
     }
     else {
-        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.setStoredSingle)(event.selectionText);
-        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.getStoredSingle)().then((idSingle) => __awaiter(void 0, void 0, void 0, function* () {
-            yield _utils_api__WEBPACK_IMPORTED_MODULE_1__.API.getArtwordData(idSingle).then((data) => {
-                chrome.tabs.create({
-                    active: false,
-                    url: data.body.urls.original,
-                });
-                (0,_utils_storage__WEBPACK_IMPORTED_MODULE_0__.setImageUrlOriginalStorage)(data.body.urls.original);
-            });
-        }));
+        const urlPixiv = event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idReg)[0];
+        functionDownloadImage(urlPixiv);
     }
 });
 chrome.runtime.onMessage.addListener(function (request) {
@@ -374,8 +407,7 @@ chrome.runtime.onMessage.addListener(function (request) {
                 if (tabs[0].url.startsWith("https://www.pixiv.net/en/artworks/")) {
                     const id = tabs[0].url.split("https://www.pixiv.net/en/artworks/")[1];
                     functionDownloadImage(id);
-                    chrome.runtime.sendMessage({ notification: "close-window" }, () => {
-                    });
+                    chrome.runtime.sendMessage({ notification: "close-window" }, () => { });
                 }
             });
         });

@@ -10,13 +10,9 @@ const App: React.FC<{}> = () => {
   const [idSingle, setIdSingle] = useState<string | "">("");
   const [idInput, setIdInput] = useState<string | "">("");
   const [idArtist, setIdArtist] = useState<string | "">("");
-  const [dataArtWord, setdataArtWord] = useState<ArtworkData | "">("");
   const [imageUrl, setImageUrl] = useState<string | "">("");
   const [offset, setOffset] = useState<number | 48>();
   const [limit, setLimit] = useState<number | 48>();
-  const [tab, setTab] = useState<number | string>();
-  const [dataInfo, setDataInfo] = useState<Array<number>>([]);
-  const [imagePreview, setImagePreview] = useState<Array<string>>([]);
   const [illusts, setIllusts] = useState<string[] | []>([]);
 
   useEffect(() => {
@@ -24,38 +20,37 @@ const App: React.FC<{}> = () => {
       setIdSingle(idSingle);
     });
   }, []);
-
-  const handleInputButtonclick = async () => {
-    const updateIdArtist = idArtist;
-    await API.getAllArtworks(updateIdArtist).then((data) => {
-      setIllusts(data.body.illusts);
-    });
-
-    const arrUrl = Object.keys(illusts);
+  const setValueAndDownload = (value: Array<string>) => {
     const imgList = [];
-
-    if (arrUrl.length > 0) {
+    if (value.length > 0) {
       chrome.storage.local.get({ userKeyIds: [] }, function (result) {
         var userKeyIds = result.userKeyIds;
-        userKeyIds.push({ keyPairId: arrUrl, HasBeenUploadedYet: false });
+        userKeyIds.push({ keyPairId: value, HasBeenUploadedYet: false });
         chrome.storage.local.set({ userKeyIds: userKeyIds }, function () {
           chrome.storage.local.get("userKeyIds", async function (result) {
             const response = result.userKeyIds[0].keyPairId.map((item) => {
               return API.getArtwordData(item);
             });
-            await Promise.all(response).then((files) => {
-              files.forEach((file) => {
-                if (file.body.pageCount <= 1) {
-                 imgList.push(file.body.urls.original);
-                } else {
-                  for (let i = 0; i < file.body.pageCount; i++) {
-                    const url = `${file.body.urls.original}`.replace("_p0", `_p${i}`);
-                   imgList.push(url);
+
+            await Promise.all(response)
+              .then((files) => {
+                files.forEach((file) => {
+                  if (file.body.pageCount <= 1) {
+                    imgList.push(file.body.urls.original);
+                  } else {
+                    for (let i = 0; i < file.body.pageCount; i++) {
+                      const url = `${file.body.urls.original}`.replace(
+                        "_p0",
+                        `_p${i}`
+                      );
+                      imgList.push(url);
+                    }
                   }
-                }
-            
+                });
+              })
+              .catch(function (err) {
+                console.log(err.message);
               });
-            });
 
             chrome.storage.local.set({ arrUrl1: imgList }, () => {
               chrome.tabs.query(
@@ -70,6 +65,15 @@ const App: React.FC<{}> = () => {
       });
     }
   };
+  const handleInputButtonclick = async () => {
+    const updateIdArtist = idArtist;
+    await API.getAllArtworks(updateIdArtist).then((data) => {
+      setIllusts(data.body.illusts);
+    });
+
+    const arrUrl = Object.keys(illusts);
+    setValueAndDownload(arrUrl);
+  };
   chrome.storage.local.set({
     item: imageUrl,
   });
@@ -82,6 +86,7 @@ const App: React.FC<{}> = () => {
       });
     });
   }
+
   const handleUserClickButton = async () => {
     const arrUrl = [];
     await API.getBookMarkOfUser(idArtist, "illusts", offset * 48, limit).then(
@@ -91,46 +96,7 @@ const App: React.FC<{}> = () => {
             arrUrl.push(item.id);
           }
         });
-        const result1 = [];
-        if (arrUrl.length > 0) {
-          chrome.storage.local.get({ userKeyIds: [] }, function (result) {
-            var userKeyIds = result.userKeyIds;
-            userKeyIds.push({ keyPairId: arrUrl, HasBeenUploadedYet: false });
-            chrome.storage.local.set({ userKeyIds: userKeyIds }, function () {
-              chrome.storage.local.get("userKeyIds", async function (result) {
-                const response = result.userKeyIds[0].keyPairId.map((item) => {
-                  return API.getArtwordData(item);
-                });
-
-                await Promise.all(response)
-                  .then((files) => {
-                    files.forEach((file) => {
-                      if (file.body.pageCount <= 1) {
-                        result1.push(file.body.urls.original);
-                       } else {
-                         for (let i = 0; i < file.body.pageCount; i++) {
-                           const url = `${file.body.urls.original}`.replace("_p0", `_p${i}`);
-                          result1.push(url);
-                         }
-                       }
-                    });
-                  })
-                  .catch(function (err) {
-                    console.log(err.message);
-                  });
-
-                chrome.storage.local.set({ arrUrl1: result1 }, () => {
-                  chrome.tabs.query(
-                    { active: true, currentWindow: true },
-                    function (tabs) {
-                      chrome.tabs.reload(tabs[0].id);
-                    }
-                  );
-                });
-              });
-            });
-          });
-        }
+        setValueAndDownload(arrUrl);
       }
     );
   };
@@ -142,38 +108,68 @@ const App: React.FC<{}> = () => {
       }
     });
   });
+
+  const cssButton = {
+    backgroundColor: "#10a1ef",
+    border: "none",
+    color: "white",
+    padding: "10px 28px",
+    TextAlign: "center",
+    display: "inline-block",
+    fontSize: "14px",
+    fontWeight: "bold",
+    margin: "4px 2px",
+    cursor: "pointer",
+  };
+
+  const styleFont = {
+    border: "1px solid black",
+    color: "black",
+    padding: "10px",
+    fontFamily: "Sans-Serif",
+  };
+
   return (
     <Box mx="9px" my="16px">
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item>
-          <Button onClick={getUrl}>get the info about artist : </Button>
+          <Button onClick={getUrl} style={cssButton }>
+            get the info about artist{" "}
+          </Button>
           <InputBase
             placeholder="Add a artist"
             value={idInput}
+            style={styleFont}
             onChange={(event: any) => {
               setIdInput(event.target.value);
             }}
           />
-          <Button onClick={handleInputButtonclick}>
-            Download image from this artist. (click 2 time to download )
+          <Button
+            onClick={handleInputButtonclick}
+            style={cssButton }
+          >
+            Download Artworkfrom this artist. (click 2 time to download )
           </Button>
         </Grid>
         <Grid item>
-          <Info idArtist={idArtist} />
+          <Info idArtist={idArtist}  />
         </Grid>
       </Grid>
       <Grid container>
         <Grid item>
           <Typography variant="h5">
-            Download from your bookmarks : `{idArtist}`
+            Download from your bookmarks 
           </Typography>
-          <Button onClick={getUrl}>Get Your id</Button>
+          <Button onClick={getUrl} style={{ border: "3px solid black" }}>
+            Get Your id
+          </Button>
         </Grid>
         <Grid item>
           {/* offset : là số tranh sẽ bỏ qua : bỏ qua 48 là bỏ page 1 */}
           <InputBase
             placeholder="add your offset to download image. Default type is : illusts"
             value={offset}
+            style={styleFont}
             onChange={(event: any) => {
               setOffset(event.target.value);
             }}
@@ -182,12 +178,16 @@ const App: React.FC<{}> = () => {
           <InputBase
             placeholder="add your limit to download image"
             value={limit}
+            style={styleFont}
             onChange={(event: any) => {
               setLimit(event.target.value);
             }}
           />
-          <Button onClick={handleUserClickButton}>
-            Download image from your bookmarks
+          <Button
+            onClick={handleUserClickButton}
+            style={cssButton }
+          >
+            Download Artworkfrom your bookmarks
           </Button>
         </Grid>
       </Grid>

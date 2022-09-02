@@ -23,7 +23,7 @@ const Info: React.FC<{
 }> = ({ idArtist }) => {
   return (
     <InfoContainer>
-      <Typography variant="h4">{idArtist}</Typography>
+      <Typography variant="h4">{idArtist ? idArtist : "Your id or artist go here"}</Typography>
     </InfoContainer>
   );
 };

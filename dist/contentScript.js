@@ -325,7 +325,7 @@ const requestOptions = {
     method: "GET",
     headers: myHeaders,
 };
-function downloadImage(url) {
+function downloadImage(url, msg = "undifined") {
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: "get",
@@ -343,8 +343,15 @@ function downloadImage(url) {
             a.click();
             URL.revokeObjectURL(url);
         })
+            .then(() => {
+            if (msg === "undifined") {
+                console.log("Shiawase ハンサム ");
+            }
+            else {
+                chrome.runtime.sendMessage({ notification: "Close" });
+            }
+        })
             .catch((e) => {
-            console.log(e);
             downloadImage(url);
             resolve(e);
             chrome.runtime.sendMessage({ notification: `reload-extension"` });
@@ -353,10 +360,10 @@ function downloadImage(url) {
 }
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
-let myImage = document.createElement('img') || string;
-myImage.style.borderRadius = '5px';
-myImage.style.border = '1px solid black';
-myImage.style.padding = '5px';
+let myImage = document.createElement("img");
+myImage.style.borderRadius = "5px";
+myImage.style.border = "1px solid black";
+myImage.style.padding = "5px";
 myImage.style.width = "150px";
 const buttonDownloadAll = document.createElement("button");
 buttonDownloadAll.innerHTML = "Download all";
@@ -378,7 +385,6 @@ buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
 let linkImg = "";
-const liArr = [];
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
         if (imagesArray.length > 2 &&
@@ -461,7 +467,6 @@ setInterval(() => {
         }
     }
 }, 100);
-console.log(liArr);
 buttonDownloadAll.addEventListener("click", function (e) {
     return __awaiter(this, void 0, void 0, function* () {
         if (imgIdArr.length > 0) {
@@ -483,65 +488,20 @@ buttonDownloadAll.addEventListener("click", function (e) {
             const response = urlArr.map((url) => {
                 return downloadImage(url);
             });
-            yield Promise.all(response).then(() => { imgIdArr = []; });
+            yield Promise.all(response).then(() => {
+                imgIdArr = [];
+            });
         }
         else {
             alert("Please select artworks");
         }
     });
 });
-(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrl)().then((res) => {
+(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => __awaiter(void 0, void 0, void 0, function* () {
     if (res.length > 0) {
-        fetch(res, requestOptions)
-            .then((response) => {
-            if (response.status == 404) {
-                const newUrlToFetch = response.url.replace(".jpg", ".png");
-                return fetch(newUrlToFetch, requestOptions);
-            }
-            else {
-                return response;
-            }
-        })
-            .then((response) => response.blob())
-            .then((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.style.display = "none";
-            a.href = url;
-            a.download = `pixiv-${Date.now()}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            URL.revokeObjectURL(url);
-        })
-            .then(() => {
-            chrome.runtime.sendMessage({ notification: "Close" });
-        })
-            .catch((e) => console.log(e));
+        downloadImage(res, "Download");
     }
-});
-(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => {
-    if (res.length > 0) {
-        fetch(res, {
-            method: "get",
-            credentials: "same-origin",
-        })
-            .then((response) => response.blob())
-            .then((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.style.display = "none";
-            a.href = url;
-            a.download = `pixiv-${Date.now()}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            URL.revokeObjectURL(url);
-        })
-            .then(() => {
-            chrome.runtime.sendMessage({ notification: "Close" });
-        })
-            .catch((e) => console.log(e));
-    }
-});
+}));
 chrome.storage.local.get("arrUrl1", function (res) {
     return __awaiter(this, void 0, void 0, function* () {
         if (res || res.arrUrl1.length > 0) {
@@ -549,18 +509,6 @@ chrome.storage.local.get("arrUrl1", function (res) {
                 return downloadImage(url);
             });
             yield Promise.all(response);
-        }
-    });
-});
-chrome.storage.local.get("arrUrl", function (res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (res || res.arrUrl.length > 0) {
-            const response = res.arrUrl.map((url) => {
-                return downloadImage(url);
-            });
-            yield Promise.all(response).then((files) => {
-                chrome.runtime.sendMessage({ notification: `Close`, data: files.length });
-            });
         }
     });
 });

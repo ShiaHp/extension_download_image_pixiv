@@ -376,17 +376,13 @@ const functionDownloadImage = (id) => __awaiter(void 0, void 0, void 0, function
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         contexts: ["selection", "link"],
-        title: "Download image from that code",
+        title: "Download image from this code",
         id: "download-image",
     });
-    chrome.contextMenus.onClicked.addListener((event) => __awaiter(void 0, void 0, void 0, function* () { }));
 });
 chrome.contextMenus.onClicked.addListener((event) => {
     if (event.selectionText) {
-        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setStoredSingle)(event.selectionText);
-        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getStoredSingle)().then((idSingle) => {
-            functionDownloadImage(idSingle);
-        });
+        functionDownloadImage(event.selectionText);
     }
     else {
         const urlPixiv = event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idReg)[0];

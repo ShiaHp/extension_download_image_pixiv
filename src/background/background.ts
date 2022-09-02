@@ -83,22 +83,17 @@ const functionDownloadImage = async (id: string) => {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     contexts: ["selection", "link"],
-    title: "Download image from that code",
+    title: "Download image from this code",
     id: "download-image",
   });
 
-  chrome.contextMenus.onClicked.addListener(async (event) => { });
 });
 
 chrome.contextMenus.onClicked.addListener((event) => {
   if (event.selectionText) {
-    setStoredSingle(event.selectionText);
-    getStoredSingle().then((idSingle) => {
-      functionDownloadImage(idSingle);
-    });
+      functionDownloadImage(event.selectionText);
   } else {
     const urlPixiv = event.linkUrl.match(idReg)[0];
-
     functionDownloadImage(urlPixiv);
   }
 });

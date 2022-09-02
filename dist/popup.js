@@ -81,7 +81,7 @@ const InfoContainer = ({ children }) => {
 };
 const Info = ({ idArtist }) => {
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(InfoContainer, null,
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_4__.default, { variant: "h4" }, idArtist)));
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_4__.default, { variant: "h4" }, idArtist ? idArtist : "Your id or artist go here")));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Info);
 
@@ -126,37 +126,29 @@ const App = () => {
     const [idSingle, setIdSingle] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
     const [idInput, setIdInput] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
     const [idArtist, setIdArtist] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
-    const [dataArtWord, setdataArtWord] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
     const [imageUrl, setImageUrl] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
     const [offset, setOffset] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
     const [limit, setLimit] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
-    const [tab, setTab] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
-    const [dataInfo, setDataInfo] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
-    const [imagePreview, setImagePreview] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
     const [illusts, setIllusts] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
         (0,_utils_storage__WEBPACK_IMPORTED_MODULE_3__.getStoredSingle)().then((idSingle) => {
             setIdSingle(idSingle);
         });
     }, []);
-    const handleInputButtonclick = () => __awaiter(void 0, void 0, void 0, function* () {
-        const updateIdArtist = idArtist;
-        yield _utils_api__WEBPACK_IMPORTED_MODULE_4__.API.getAllArtworks(updateIdArtist).then((data) => {
-            setIllusts(data.body.illusts);
-        });
-        const arrUrl = Object.keys(illusts);
+    const setValueAndDownload = (value) => {
         const imgList = [];
-        if (arrUrl.length > 0) {
+        if (value.length > 0) {
             chrome.storage.local.get({ userKeyIds: [] }, function (result) {
                 var userKeyIds = result.userKeyIds;
-                userKeyIds.push({ keyPairId: arrUrl, HasBeenUploadedYet: false });
+                userKeyIds.push({ keyPairId: value, HasBeenUploadedYet: false });
                 chrome.storage.local.set({ userKeyIds: userKeyIds }, function () {
                     chrome.storage.local.get("userKeyIds", function (result) {
                         return __awaiter(this, void 0, void 0, function* () {
                             const response = result.userKeyIds[0].keyPairId.map((item) => {
                                 return _utils_api__WEBPACK_IMPORTED_MODULE_4__.API.getArtwordData(item);
                             });
-                            yield Promise.all(response).then((files) => {
+                            yield Promise.all(response)
+                                .then((files) => {
                                 files.forEach((file) => {
                                     if (file.body.pageCount <= 1) {
                                         imgList.push(file.body.urls.original);
@@ -168,6 +160,9 @@ const App = () => {
                                         }
                                     }
                                 });
+                            })
+                                .catch(function (err) {
+                                console.log(err.message);
                             });
                             chrome.storage.local.set({ arrUrl1: imgList }, () => {
                                 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -179,6 +174,14 @@ const App = () => {
                 });
             });
         }
+    };
+    const handleInputButtonclick = () => __awaiter(void 0, void 0, void 0, function* () {
+        const updateIdArtist = idArtist;
+        yield _utils_api__WEBPACK_IMPORTED_MODULE_4__.API.getAllArtworks(updateIdArtist).then((data) => {
+            setIllusts(data.body.illusts);
+        });
+        const arrUrl = Object.keys(illusts);
+        setValueAndDownload(arrUrl);
     });
     chrome.storage.local.set({
         item: imageUrl,
@@ -200,44 +203,7 @@ const App = () => {
                     arrUrl.push(item.id);
                 }
             });
-            const result1 = [];
-            if (arrUrl.length > 0) {
-                chrome.storage.local.get({ userKeyIds: [] }, function (result) {
-                    var userKeyIds = result.userKeyIds;
-                    userKeyIds.push({ keyPairId: arrUrl, HasBeenUploadedYet: false });
-                    chrome.storage.local.set({ userKeyIds: userKeyIds }, function () {
-                        chrome.storage.local.get("userKeyIds", function (result) {
-                            return __awaiter(this, void 0, void 0, function* () {
-                                const response = result.userKeyIds[0].keyPairId.map((item) => {
-                                    return _utils_api__WEBPACK_IMPORTED_MODULE_4__.API.getArtwordData(item);
-                                });
-                                yield Promise.all(response)
-                                    .then((files) => {
-                                    files.forEach((file) => {
-                                        if (file.body.pageCount <= 1) {
-                                            result1.push(file.body.urls.original);
-                                        }
-                                        else {
-                                            for (let i = 0; i < file.body.pageCount; i++) {
-                                                const url = `${file.body.urls.original}`.replace("_p0", `_p${i}`);
-                                                result1.push(url);
-                                            }
-                                        }
-                                    });
-                                })
-                                    .catch(function (err) {
-                                    console.log(err.message);
-                                });
-                                chrome.storage.local.set({ arrUrl1: result1 }, () => {
-                                    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                                        chrome.tabs.reload(tabs[0].id);
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            }
+            setValueAndDownload(arrUrl);
         });
     });
     chrome.runtime.sendMessage({ notification: "download" }, () => {
@@ -247,31 +213,48 @@ const App = () => {
             }
         });
     });
+    const cssButton = {
+        backgroundColor: "#10a1ef",
+        border: "none",
+        color: "white",
+        padding: "10px 28px",
+        TextAlign: "center",
+        display: "inline-block",
+        fontSize: "14px",
+        fontWeight: "bold",
+        margin: "4px 2px",
+        cursor: "pointer",
+    };
+    const styleFont = {
+        border: "1px solid black",
+        color: "black",
+        padding: "10px",
+        fontFamily: "Sans-Serif",
+    };
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_6__.default, { mx: "9px", my: "16px" },
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { container: true },
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { container: true, spacing: 2 },
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { item: true },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: getUrl }, "get the info about artist : "),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_9__.default, { placeholder: "Add a artist", value: idInput, onChange: (event) => {
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: getUrl, style: cssButton },
+                    "get the info about artist",
+                    " "),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_9__.default, { placeholder: "Add a artist", value: idInput, style: styleFont, onChange: (event) => {
                         setIdInput(event.target.value);
                     } }),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: handleInputButtonclick }, "Download image from this artist. (click 2 time to download )")),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: handleInputButtonclick, style: cssButton }, "Download Artworkfrom this artist. (click 2 time to download )")),
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { item: true },
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_popup_Info_Info__WEBPACK_IMPORTED_MODULE_2__.default, { idArtist: idArtist }))),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { container: true },
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { item: true },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_10__.default, { variant: "h5" },
-                    "Download from your bookmarks : `",
-                    idArtist,
-                    "`"),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: getUrl }, "Get Your id")),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_10__.default, { variant: "h5" }, "Download from your bookmarks"),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: getUrl, style: { border: "3px solid black" } }, "Get Your id")),
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__.default, { item: true },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_9__.default, { placeholder: "add your offset to download image. Default type is : illusts", value: offset, onChange: (event) => {
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_9__.default, { placeholder: "add your offset to download image. Default type is : illusts", value: offset, style: styleFont, onChange: (event) => {
                         setOffset(event.target.value);
                     } }),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_9__.default, { placeholder: "add your limit to download image", value: limit, onChange: (event) => {
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_9__.default, { placeholder: "add your limit to download image", value: limit, style: styleFont, onChange: (event) => {
                         setLimit(event.target.value);
                     } }),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: handleUserClickButton }, "Download image from your bookmarks")))));
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_8__.default, { onClick: handleUserClickButton, style: cssButton }, "Download Artworkfrom your bookmarks")))));
 };
 const root = document.createElement("div");
 document.body.appendChild(root);

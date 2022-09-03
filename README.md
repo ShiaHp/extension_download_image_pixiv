@@ -32,7 +32,8 @@ _Đây là một pet project để học hỏi, cải thiện và vọc vạch n
 - Tải tất cả ảnh của 1 tác giả bất kỳ
 - Tải tất cả ảnh từ bookmarks của người dùng
 
-  ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/img3.png)
+  ![ezgif com-gif-maker (3)](https://user-images.githubusercontent.com/88889182/188258662-56a1fbe1-8f2a-42cb-af1a-2cefb5ec6ec1.gif)
+
   
 - Tải ảnh từ link ở bất cứ nguồn nào như : youtobe,facebook,
   

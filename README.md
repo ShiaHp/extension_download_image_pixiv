@@ -26,11 +26,14 @@ _Đây là một pet project để học hỏi, cải thiện và vọc vạch n
   ![ezgif com-gif-maker](https://user-images.githubusercontent.com/88889182/188258459-801c4ff6-dd80-4d95-82a2-e8ed24b2e5ef.gif)
 
 - Tải nhiều ảnh một lúc khi lựa chọn những bức ảnh mong muốn tải và nhấn vào nút "Download all" bên phải màn hình
+
     ![ezgif com-gif-maker (2)](https://user-images.githubusercontent.com/88889182/188258468-e324c2d6-66ec-435b-8378-5b8a98522a6d.gif)
 
 - Tải tất cả ảnh của 1 tác giả bất kỳ
 - Tải tất cả ảnh từ bookmarks của người dùng
+
   ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/img3.png)
+  
 - Tải ảnh từ link ở bất cứ nguồn nào như : youtobe,facebook,
   
   ![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/88889182/188258474-582f23db-8537-41ec-9564-5f29c079133f.gif)

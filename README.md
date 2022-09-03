@@ -8,7 +8,7 @@ _Đây là một pet project để học hỏi, cải thiện và vọc vạch n
 
 - Đây là project được truyền cảm hứng và tham khảo từ extension PixivBatchDownloader
 - Vốn ban đầu mình có ý tưởng làm pj này khi lướt nghe nhạc trên youtobe thì thấy những ảnh nền video có link
-  từ pixiv. Cảm thấy việc phải click từng cái link rồi vào thẳng web rất là mệt mỏi nên mình đã thử viết 1 cái extension
+  từ pixiv. Cảm thấy việc phải click từng cái link rồi vào thẳng web rồi tải tay từng cái rất là mệt mỏi nên mình đã thử viết 1 cái extension
 - Sau khi tu xong khóa học cấp tốc extenison thì mình bắt tay vào viết luôn và đã đạt được mục đích ban đầu tuy nhiên lại không hài lòng lắm. https://github.com/ShiaHp/extension_download_pixiv
 - Thời điểm đó mình có sử dụng extension PixivBatchDownloader và rất ưng ý vì sự tiện lợi của nó, cảm thấy mình có thể viết 1 cái tương tự nên đã bắt đầu viết lại bằng typesciprt và react
 
@@ -22,18 +22,18 @@ _Đây là một pet project để học hỏi, cải thiện và vọc vạch n
 ## Những chức năng chính của dự án :
 
 - Tải ảnh khi nhấn vào nút trên ảnh ( lưu ý phải hover vào ảnh trước dù nút tải nằm trong ảnh rồi):
-  ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/icon.png)
+  
+  ![ezgif com-gif-maker](https://user-images.githubusercontent.com/88889182/188258459-801c4ff6-dd80-4d95-82a2-e8ed24b2e5ef.gif)
 
 - Tải nhiều ảnh một lúc khi lựa chọn những bức ảnh mong muốn tải và nhấn vào nút "Download all" bên phải màn hình
-  ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/img2.png)
+    ![ezgif com-gif-maker (2)](https://user-images.githubusercontent.com/88889182/188258468-e324c2d6-66ec-435b-8378-5b8a98522a6d.gif)
+
 - Tải tất cả ảnh của 1 tác giả bất kỳ
 - Tải tất cả ảnh từ bookmarks của người dùng
   ![alt text](https://github.com/ShiaHp/extension_download_image_pixiv/blob/main/src/img/img3.png)
 - Tải ảnh từ link ở bất cứ nguồn nào như : youtobe,facebook,
-  ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/1.png)
-  ![alt text](https://github.com/ShiaHp/extension_download_pixiv/blob/main/img/4.png)
-
-
+  
+  ![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/88889182/188258474-582f23db-8537-41ec-9564-5f29c079133f.gif)
 
 ## Để chạy dự án :
  - Bạn cần cài đặt môi trường node. Khuyến khích sử dụng node version 16 vì hiện tại đang có lỗi với v18

@@ -355,20 +355,12 @@ const functionDownloadImage = (id) => __awaiter(void 0, void 0, void 0, function
                 imgList.push(url);
             }
             chrome.storage.local.set({ arrUrl1: imgList }, () => {
-                chrome.tabs.query({}, () => {
+                chrome.tabs.query({}, (tabs) => __awaiter(void 0, void 0, void 0, function* () {
                     chrome.tabs.create({
                         active: false,
                         url: data.body.urls.original,
-                    }, function (tab) {
-                        let dataTime = 1000;
-                        if (data.body.pageCount >= 10) {
-                            dataTime = 10000;
-                            setTimeout(function () {
-                                chrome.tabs.remove(tab.id);
-                            }, dataTime);
-                        }
                     });
-                });
+                }));
             });
         }
     });

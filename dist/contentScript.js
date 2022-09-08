@@ -508,7 +508,15 @@ chrome.storage.local.get("arrUrl1", function (res) {
             const response = res.arrUrl1.map((url) => {
                 return downloadImage(url);
             });
+            yield new Promise(resolve => {
+                setTimeout(() => {
+                    chrome.runtime.sendMessage({ notification: "Close" });
+                    resolve();
+                }, 2000);
+            });
             yield Promise.all(response);
+        }
+        if (res.arrUrl1[0].startsWith("https://i.pximg.net/")) {
         }
     });
 });

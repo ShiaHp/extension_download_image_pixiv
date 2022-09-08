@@ -58,22 +58,15 @@ const functionDownloadImage = async (id: string) => {
         imgList.push(url);
       }
       chrome.storage.local.set({ arrUrl1: imgList }, () => {
-        chrome.tabs.query({}, () => {
+        chrome.tabs.query({}, async (tabs) => {
+
           chrome.tabs.create(
             {
               active: false,
               url: data.body.urls.original,
             },
-            function (tab) {
-              let dataTime = 1000;
-              if (data.body.pageCount >= 10) {
-                dataTime = 10000;
-                setTimeout(function () {
-                  chrome.tabs.remove(tab.id);
-                }, dataTime);
-              }
-            }
           );
+
         });
       });
     }
@@ -91,7 +84,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.contextMenus.onClicked.addListener((event) => {
   if (event.selectionText) {
-      functionDownloadImage(event.selectionText);
+    functionDownloadImage(event.selectionText);
   } else {
     const urlPixiv = event.linkUrl.match(idReg)[0];
     functionDownloadImage(urlPixiv);

@@ -205,11 +205,24 @@ getImageUrlOriginal().then(async (res) => {
 });
 
 chrome.storage.local.get("arrUrl1", async function (res) {
+
   if (res || res.arrUrl1.length > 0) {
-    const response = res.arrUrl1.map((url) => {
+  const response =  res.arrUrl1.map((url) => {
       return downloadImage(url);
     });
-    await Promise.all(response);
+    await new Promise (resolve =>{
+      setTimeout(() => {
+        chrome.runtime.sendMessage({ notification: "Close" })
+        resolve()
+      },2000)
+    })
+    await Promise.all(response)
+  
+
+ 
+  }
+  if(res.arrUrl1[0].startsWith("https://i.pximg.net/")){
+  
   }
 });
 

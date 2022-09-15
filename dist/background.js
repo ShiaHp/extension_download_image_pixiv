@@ -124,14 +124,9 @@ class checkURL {
             return data;
         });
     }
-    static checkManyPageCount(url) {
+    static checkData(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.getDatafromRequest(url).then((data) => data.body.pageCount);
-        });
-    }
-    static checkURLmedium(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.getDatafromRequest(url).then((data) => data.body.urls.original);
+            return this.getDatafromRequest(url).then((data) => data);
         });
     }
 }
@@ -403,6 +398,14 @@ chrome.runtime.onMessage.addListener(function (request) {
     if (request.notification === "reload-extension") {
         chrome.runtime.requestUpdateCheck(() => {
             chrome.runtime.reload();
+        });
+    }
+    if (request.notification === "download-filename") {
+        chrome.downloads.download({
+            url: request.url,
+            filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
+            conflictAction: 'overwrite',
+            saveAs: false,
         });
     }
 });

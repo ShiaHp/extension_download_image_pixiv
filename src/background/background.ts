@@ -120,4 +120,13 @@ chrome.runtime.onMessage.addListener(function (request) {
       chrome.runtime.reload();
     });
   }
+
+  if(request.notification === "download-filename"){
+    chrome.downloads.download({
+      url : request.url,
+      filename : `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
+      conflictAction: 'overwrite',
+      saveAs: false,
+    })
+  }
 });

@@ -124,14 +124,9 @@ class checkURL {
             return data;
         });
     }
-    static checkManyPageCount(url) {
+    static checkData(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.getDatafromRequest(url).then((data) => data.body.pageCount);
-        });
-    }
-    static checkURLmedium(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.getDatafromRequest(url).then((data) => data.body.urls.original);
+            return this.getDatafromRequest(url).then((data) => data);
         });
     }
 }
@@ -391,10 +386,6 @@ setInterval(() => {
             imagesArray[i].parentElement &&
             imagesArray[i].parentElement.childNodes &&
             imagesArray[i].parentElement.childNodes.length <= 1) {
-            // const tab = document.getElementsByTagName('li')
-            // if (tab[i].className.includes("sc-9y4be5-2")) {
-            //   liArr.push(tab[i].className.includes("sc-9y4be5-2"))
-            // }
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.id = "checkbox";
@@ -427,16 +418,18 @@ setInterval(() => {
             button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
             function checkImage(url) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const count = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkManyPageCount(url);
-                    if (count <= 1) {
-                        const newUrl = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkURLmedium(url);
-                        downloadImage(newUrl);
+                    const data = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkData(url);
+                    const nameArtist = data.body.userName;
+                    const count = data.body.pageCount;
+                    const urlFromAPI = data.body.urls.original;
+                    const filename = data.body.illustTitle;
+                    if (data.body.pageCount <= 1) {
+                        getUrlAfterDownload(urlFromAPI, nameArtist);
                     }
                     else {
-                        const newUrl = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkURLmedium(url);
                         for (let i = 0; i < count; i++) {
-                            const url = `${newUrl}`.replace("_p0", `_p${i}`);
-                            downloadImage(url);
+                            const url = `${urlFromAPI}`.replace("_p0", `_p${i}`);
+                            getUrlAfterDownload(url, nameArtist);
                         }
                     }
                 });
@@ -497,6 +490,33 @@ buttonDownloadAll.addEventListener("click", function (e) {
         }
     });
 });
+function getUrlAfterDownload(newurl, filename) {
+    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+        yield fetch(newurl, {
+            method: "get",
+            credentials: "same-origin",
+            headers: myHeaders,
+        }).then((response) => response.blob())
+            .then((blob) => {
+            const url = URL.createObjectURL(blob);
+            sendDownload(url, filename);
+        }).catch((e) => {
+            getUrlAfterDownload(newurl, filename);
+            resolve(e);
+            chrome.runtime.sendMessage({ notification: `reload-extension"` });
+        });
+    }));
+}
+function sendDownload(urlInput, filename) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // const url = await getUrlAfterDownload(urlInput,filename);
+        chrome.runtime.sendMessage({
+            notification: "download-filename",
+            url: urlInput,
+            filename: filename,
+        });
+    });
+}
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => __awaiter(void 0, void 0, void 0, function* () {
     if (res.length > 0) {
         downloadImage(res, "Download");
@@ -505,18 +525,17 @@ buttonDownloadAll.addEventListener("click", function (e) {
 chrome.storage.local.get("arrUrl1", function (res) {
     return __awaiter(this, void 0, void 0, function* () {
         if (res || res.arrUrl1.length > 0) {
+            console.log(res.arrUrl1);
             const response = res.arrUrl1.map((url) => {
                 return downloadImage(url);
             });
-            yield new Promise(resolve => {
-                setTimeout(() => {
-                    chrome.runtime.sendMessage({ notification: "Close" });
-                    resolve();
-                }, 2000);
-            });
+            // await new Promise((resolve) => {
+            //   setTimeout(() => {
+            //     chrome.runtime.sendMessage({ notification: "Close" });
+            //     resolve();
+            //   }, 2000);
+            // });
             yield Promise.all(response);
-        }
-        if (res.arrUrl1[0].startsWith("https://i.pximg.net/")) {
         }
     });
 });

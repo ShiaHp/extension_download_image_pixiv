@@ -8,13 +8,9 @@ export class checkURL {
     const data = await API.getArtwordData(id);
     return data;
   }
-  static async checkManyPageCount(url: string) {
-    return this.getDatafromRequest(url).then((data) => data.body.pageCount)
+  static async checkData(url: string) {
+    return this.getDatafromRequest(url).then((data) => data)
   }
 
-  static async checkURLmedium(url: string): Promise<string> {
-
-    return this.getDatafromRequest(url).then((data) => data.body.urls.original)
-
-  }
+ 
 }

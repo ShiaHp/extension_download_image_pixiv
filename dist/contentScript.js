@@ -361,6 +361,25 @@ myImage.style.border = "1px solid black";
 myImage.style.padding = "5px";
 myImage.style.width = "150px";
 const buttonDownloadAll = document.createElement("button");
+const myProgress = document.createElement("div");
+myProgress.setAttribute("id", "myProgress");
+const processBar = document.createElement("div");
+processBar.setAttribute("id", "myBar");
+myProgress.appendChild(processBar);
+myProgress.style.width = "100px";
+myProgress.style.height = "10px";
+myProgress.style.backgroundColor = "#ddd";
+myProgress.style.display = "none";
+processBar.style.fontSize = "15px";
+processBar.style.width = "10%";
+processBar.style.height = "10px";
+myProgress.style.zIndex = "1000";
+processBar.style.backgroundColor = "#04AA6D";
+myProgress.style.position = "fixed";
+myProgress.style.right = "0";
+myProgress.style.bottom = "0";
+myProgress.style.padding = "0.5rem";
+myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
 buttonDownloadAll.innerHTML = "Download all";
 buttonDownloadAll.style.zIndex = "9999";
 buttonDownloadAll.style.backgroundColor = "#52e010";
@@ -379,6 +398,7 @@ buttonDownloadAll.style.transform = "scale(0.98)";
 buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
+body.appendChild(myProgress);
 let linkImg = "";
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
@@ -491,21 +511,60 @@ buttonDownloadAll.addEventListener("click", function (e) {
     });
 });
 function getUrlAfterDownload(newurl, filename) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-        yield fetch(newurl, {
-            method: "get",
-            credentials: "same-origin",
-            headers: myHeaders,
-        }).then((response) => response.blob())
-            .then((blob) => {
-            const url = URL.createObjectURL(blob);
-            sendDownload(url, filename);
-        }).catch((e) => {
-            getUrlAfterDownload(newurl, filename);
-            resolve(e);
-            chrome.runtime.sendMessage({ notification: `reload-extension"` });
-        });
-    }));
+    return __awaiter(this, void 0, void 0, function* () {
+        let elem = document.getElementById("myBar");
+        let myProgress = document.getElementById("myProgress");
+        myProgress.style.display = "block";
+        elem.style.display = "block";
+        yield new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            const responseafterdownload = yield fetch(newurl, {
+                method: "get",
+                credentials: "same-origin",
+                headers: myHeaders,
+            }).catch((e) => {
+                getUrlAfterDownload(newurl, filename);
+                resolve(e);
+                chrome.runtime.sendMessage({ notification: `reload-extension"` });
+            });
+            if (responseafterdownload) {
+                let dataDownload = yield responseafterdownload.clone();
+                const reader = dataDownload.body.getReader();
+                const contentLength = +responseafterdownload.headers.get("Content-Length");
+                let receivedLength = 0;
+                while (true) {
+                    const { done, value } = yield reader.read();
+                    if (done) {
+                        break;
+                    }
+                    receivedLength += value.length;
+                    elem.style.width = Math.floor((receivedLength / contentLength) * 100) + "%";
+                    elem.innerHTML = Math.floor((receivedLength / contentLength) * 100) + "%";
+                }
+                if (elem.innerHTML == "Infinity%") {
+                    elem.style.width = 0 + "%";
+                    elem.innerHTML = "Redownload";
+                    myProgress.style.display = "none";
+                    /* những tấm ảnh ở đây là những tấm k thể đọc hay tải nên dùng cách truyền thống*/
+                    // downloadImage(newurl)
+                    yield responseafterdownload.blob().then((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        sendDownload(url, filename);
+                    });
+                }
+                else if (receivedLength == contentLength && elem.innerHTML == "100%") {
+                    setTimeout(() => {
+                        myProgress.style.display = "none";
+                        elem.style.width = 0 + "%";
+                        elem.innerHTML = 0 + "%";
+                    }, 100);
+                    yield responseafterdownload.blob().then((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        sendDownload(url, filename);
+                    });
+                }
+            }
+        }));
+    });
 }
 function sendDownload(urlInput, filename) {
     return __awaiter(this, void 0, void 0, function* () {

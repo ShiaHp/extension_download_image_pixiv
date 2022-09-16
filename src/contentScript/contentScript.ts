@@ -50,12 +50,33 @@ function downloadImage(url: string, msg = "undifined") {
 
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
+
 let myImage = document.createElement("img") as HTMLImageElement;
 myImage.style.borderRadius = "5px";
 myImage.style.border = "1px solid black";
 myImage.style.padding = "5px";
 myImage.style.width = "150px";
 const buttonDownloadAll = document.createElement("button");
+const myProgress = document.createElement("div");
+myProgress.setAttribute("id", "myProgress");
+const processBar = document.createElement("div");
+processBar.setAttribute("id", "myBar");
+myProgress.appendChild(processBar);
+myProgress.style.width = "100px";
+myProgress.style.height = "10px"
+myProgress.style.backgroundColor = "#ddd";
+myProgress.style.display = "none";
+processBar.style.fontSize = "15px";
+processBar.style.width = "10%";
+processBar.style.height = "10px";
+myProgress.style.zIndex = "1000";
+processBar.style.backgroundColor = "#04AA6D";
+myProgress.style.position = "fixed";
+myProgress.style.right = "0";
+myProgress.style.bottom = "0";
+myProgress.style.padding = "0.5rem";
+myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
+
 buttonDownloadAll.innerHTML = "Download all";
 buttonDownloadAll.style.zIndex = "9999";
 buttonDownloadAll.style.backgroundColor = "#52e010";
@@ -73,7 +94,9 @@ buttonDownloadAll.style.cursor = "pointer";
 buttonDownloadAll.style.transform = "scale(0.98)";
 buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
+
 body.appendChild(buttonDownloadAll);
+body.appendChild(myProgress);
 let linkImg = "";
 
 setInterval(() => {
@@ -84,7 +107,6 @@ setInterval(() => {
       imagesArray[i].parentElement.childNodes &&
       imagesArray[i].parentElement.childNodes.length <= 1
     ) {
-
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.id = "checkbox";
@@ -122,15 +144,15 @@ setInterval(() => {
       async function checkImage(url: string) {
         const data = await checkURL.checkData(url);
         const nameArtist = data.body.userName;
-        const count = data.body.pageCount
+        const count = data.body.pageCount;
         const urlFromAPI = data.body.urls.original;
-        const filename = data.body.illustTitle
+        const filename = data.body.illustTitle;
         if (data.body.pageCount <= 1) {
-          getUrlAfterDownload(urlFromAPI,  nameArtist)
+          getUrlAfterDownload(urlFromAPI, nameArtist);
         } else {
           for (let i = 0; i < count; i++) {
             const url = `${urlFromAPI}`.replace("_p0", `_p${i}`);
-            getUrlAfterDownload(url,  nameArtist);
+            getUrlAfterDownload(url, nameArtist);
           }
         }
       }
@@ -195,24 +217,78 @@ buttonDownloadAll.addEventListener("click", async function (e) {
   }
 });
 
-function getUrlAfterDownload(newurl: string, filename: string) {
-  return new Promise(async (resolve, reject) => {
-    await fetch(newurl, {
+async function getUrlAfterDownload(newurl: string, filename: string) {
+
+  let elem = document.getElementById("myBar");
+  let myProgress = document.getElementById("myProgress");
+  myProgress.style.display = "block";
+  elem.style.display = "block";
+
+  await new Promise(async (resolve, reject) => {
+    const responseafterdownload = await fetch(newurl, {
       method: "get",
       credentials: "same-origin",
       headers: myHeaders,
-    }).then((response) => response.blob())
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        sendDownload(url, filename)
-      }).catch((e) => {
-        getUrlAfterDownload(newurl, filename);
-        resolve(e);
-        chrome.runtime.sendMessage({ notification: `reload-extension"` });
-      });
-  });
+    }).catch((e) => {
+      getUrlAfterDownload(newurl, filename);
+      resolve(e);
+      chrome.runtime.sendMessage({ notification: `reload-extension"` });
+    });
+
+    if (responseafterdownload) {
+      let dataDownload = await responseafterdownload.clone();
+      const reader = dataDownload.body.getReader();
+      const contentLength = +responseafterdownload.headers.get("Content-Length");
+      let receivedLength = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+  
+        receivedLength += value.length;
+        elem.style.width = Math.floor((receivedLength / contentLength) * 100) + "%";
+        elem.innerHTML = Math.floor((receivedLength / contentLength) * 100) + "%";
+        
+
+      
+      }
+
+
+      if(elem.innerHTML == "Infinity%"){
+        elem.style.width = 0 + "%";
+        elem.innerHTML = "Redownload";
+        myProgress.style.display = "none";
+       /* những tấm ảnh ở đây là những tấm k thể đọc hay tải nên dùng cách truyền thống*/
+        // downloadImage(newurl)
+        await responseafterdownload.blob().then((blob) => {
+          const url = URL.createObjectURL(blob);
+          sendDownload(url, filename);
+        })
+      
+      } else if (receivedLength == contentLength && elem.innerHTML == "100%") {
+        setTimeout(() => {
+          myProgress.style.display = "none";
+          elem.style.width = 0 + "%";
+          elem.innerHTML = 0 + "%";
+        }, 100);
+  
+        await responseafterdownload.blob().then((blob) => {
+          const url = URL.createObjectURL(blob);
+          sendDownload(url, filename);
+        })
+      }
+    }
+   
+
+  })
+
+
+
+
 
 }
+
 async function sendDownload(urlInput, filename) {
   // const url = await getUrlAfterDownload(urlInput,filename);
 
@@ -221,8 +297,6 @@ async function sendDownload(urlInput, filename) {
     url: urlInput,
     filename: filename,
   });
-
-
 }
 
 getImageUrlOriginal().then(async (res) => {
@@ -233,7 +307,7 @@ getImageUrlOriginal().then(async (res) => {
 
 chrome.storage.local.get("arrUrl1", async function (res) {
   if (res || res.arrUrl1.length > 0) {
-    console.log(res.arrUrl1)
+    console.log(res.arrUrl1);
     const response = res.arrUrl1.map((url) => {
       return downloadImage(url);
     });
@@ -245,7 +319,6 @@ chrome.storage.local.get("arrUrl1", async function (res) {
     // });
     await Promise.all(response);
   }
- 
 });
 
 clearImageUrl();

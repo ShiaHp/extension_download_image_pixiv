@@ -115,7 +115,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
+const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
 class checkURL {
     static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -316,10 +316,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 const myHeaders = new Headers();
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
-const requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-};
 function downloadImage(url, msg = "undifined") {
     return new Promise((resolve, reject) => {
         fetch(url, {
@@ -361,25 +357,6 @@ myImage.style.border = "1px solid black";
 myImage.style.padding = "5px";
 myImage.style.width = "150px";
 const buttonDownloadAll = document.createElement("button");
-const myProgress = document.createElement("div");
-myProgress.setAttribute("id", "myProgress");
-const processBar = document.createElement("div");
-processBar.setAttribute("id", "myBar");
-myProgress.appendChild(processBar);
-myProgress.style.width = "100px";
-myProgress.style.height = "10px";
-myProgress.style.backgroundColor = "#ddd";
-myProgress.style.display = "none";
-processBar.style.fontSize = "15px";
-processBar.style.width = "10%";
-processBar.style.height = "10px";
-myProgress.style.zIndex = "1000";
-processBar.style.backgroundColor = "#04AA6D";
-myProgress.style.position = "fixed";
-myProgress.style.right = "0";
-myProgress.style.bottom = "0";
-myProgress.style.padding = "0.5rem";
-myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
 buttonDownloadAll.innerHTML = "Download all";
 buttonDownloadAll.style.zIndex = "9999";
 buttonDownloadAll.style.backgroundColor = "#52e010";
@@ -398,7 +375,6 @@ buttonDownloadAll.style.transform = "scale(0.98)";
 buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
 const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
-body.appendChild(myProgress);
 let linkImg = "";
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
@@ -436,24 +412,6 @@ setInterval(() => {
             button.style.transform = "scale(0.98)";
             button.style.opacity = "0.5rem";
             button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
-            function checkImage(url) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const data = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkData(url);
-                    const nameArtist = data.body.userName;
-                    const count = data.body.pageCount;
-                    const urlFromAPI = data.body.urls.original;
-                    const filename = data.body.illustTitle;
-                    if (data.body.pageCount <= 1) {
-                        getUrlAfterDownload(urlFromAPI, nameArtist);
-                    }
-                    else {
-                        for (let i = 0; i < count; i++) {
-                            const url = `${urlFromAPI}`.replace("_p0", `_p${i}`);
-                            getUrlAfterDownload(url, nameArtist);
-                        }
-                    }
-                });
-            }
             checkbox.addEventListener("click", function (e) {
                 e.stopPropagation();
                 const id = e.path[1].innerHTML.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.idReg)[0];
@@ -470,13 +428,13 @@ setInterval(() => {
                 myImage.src = this.src;
                 linkImg = this.src;
             });
+            imagesArray[i].parentElement.appendChild(button);
+            imagesArray[i].parentElement.appendChild(checkbox);
             button.onclick = function (e) {
                 e.stopPropagation();
                 e.preventDefault();
                 checkImage(linkImg);
             };
-            imagesArray[i].parentElement.appendChild(button);
-            imagesArray[i].parentElement.appendChild(checkbox);
         }
     }
 }, 100);
@@ -510,70 +468,144 @@ buttonDownloadAll.addEventListener("click", function (e) {
         }
     });
 });
-function getUrlAfterDownload(newurl, filename) {
+let countQueue = 0;
+let queue = [];
+let queueCountEveryArtworkHadBeenChoosed = [];
+const myProgress = document.createElement("div");
+myProgress.setAttribute("id", "myProgress");
+const processBar = document.createElement("div");
+processBar.setAttribute("id", "myBar");
+myProgress.appendChild(processBar);
+function createProcess(responseafterdownload, filename, urlFromAPI) {
     return __awaiter(this, void 0, void 0, function* () {
-        let elem = document.getElementById("myBar");
-        let myProgress = document.getElementById("myProgress");
+        myProgress.style.width = "100px";
+        myProgress.style.height = "10px";
+        myProgress.style.backgroundColor = "#ddd";
+        myProgress.style.display = "none";
+        processBar.style.fontSize = "15px";
+        processBar.style.width = "10%";
+        processBar.style.height = "10px";
+        myProgress.style.zIndex = "1000";
+        processBar.style.backgroundColor = "#04AA6D";
+        myProgress.style.position = "fixed";
+        myProgress.style.right = "0";
+        myProgress.style.bottom = "0";
+        myProgress.style.padding = "0.5rem";
+        myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
         myProgress.style.display = "block";
-        elem.style.display = "block";
-        yield new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            const responseafterdownload = yield fetch(newurl, {
-                method: "get",
-                credentials: "same-origin",
-                headers: myHeaders,
-            }).catch((e) => {
-                getUrlAfterDownload(newurl, filename);
-                resolve(e);
-                chrome.runtime.sendMessage({ notification: `reload-extension"` });
-            });
-            if (responseafterdownload) {
-                let dataDownload = yield responseafterdownload.clone();
-                const reader = dataDownload.body.getReader();
-                const contentLength = +responseafterdownload.headers.get("Content-Length");
-                let receivedLength = 0;
-                while (true) {
-                    const { done, value } = yield reader.read();
-                    if (done) {
-                        break;
-                    }
-                    receivedLength += value.length;
-                    elem.style.width = Math.floor((receivedLength / contentLength) * 100) + "%";
-                    elem.innerHTML = Math.floor((receivedLength / contentLength) * 100) + "%";
-                }
-                if (elem.innerHTML == "Infinity%") {
-                    elem.style.width = 0 + "%";
-                    elem.innerHTML = "Redownload";
-                    myProgress.style.display = "none";
-                    /* những tấm ảnh ở đây là những tấm k thể đọc hay tải nên dùng cách truyền thống*/
-                    // downloadImage(newurl)
-                    yield responseafterdownload.blob().then((blob) => {
-                        const url = URL.createObjectURL(blob);
-                        sendDownload(url, filename);
-                    });
-                }
-                else if (receivedLength == contentLength && elem.innerHTML == "100%") {
-                    setTimeout(() => {
-                        myProgress.style.display = "none";
-                        elem.style.width = 0 + "%";
-                        elem.innerHTML = 0 + "%";
-                    }, 100);
-                    yield responseafterdownload.blob().then((blob) => {
-                        const url = URL.createObjectURL(blob);
-                        sendDownload(url, filename);
-                    });
-                }
-            }
+        processBar.style.display = "block";
+        myProgress.style.bottom = `${countQueue * 10} px`;
+        body.appendChild(myProgress);
+        let dataDownload = yield responseafterdownload.clone();
+        const reader = dataDownload.body.getReader();
+        const contentLength = +responseafterdownload.headers.get("Content-Length");
+        yield readContentLength(contentLength, reader, processBar, myProgress);
+        responseafterdownload.blob().then((blob) => __awaiter(this, void 0, void 0, function* () {
+            const url = URL.createObjectURL(blob);
+            sendDownload(url, filename);
         }));
     });
 }
-function sendDownload(urlInput, filename) {
+function readContentLength(contentLength, reader, processBar, myProgress1) {
     return __awaiter(this, void 0, void 0, function* () {
-        // const url = await getUrlAfterDownload(urlInput,filename);
-        chrome.runtime.sendMessage({
-            notification: "download-filename",
-            url: urlInput,
-            filename: filename,
-        });
+        let receivedLength = 0;
+        while (true) {
+            const { done, value } = yield reader.read();
+            if (done) {
+                break;
+            }
+            receivedLength += value.length;
+            processBar.style.width =
+                Math.floor((receivedLength / contentLength) * 100) + "%";
+            processBar.innerHTML =
+                Math.floor((receivedLength / contentLength) * 100) + "%";
+        }
+        if (receivedLength == contentLength ||
+            processBar.innerHTML == "100%" ||
+            processBar.innerHTML == "Infinity%") {
+            myProgress1.style.display = "none";
+            processBar.style.width = 0 + "%";
+            processBar.innerHTML = 0 + "%";
+        }
+    });
+}
+function asyncEachUrl(array, callback) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // let countTime = 0;
+        for (let index = 0; index < array.length; index++) {
+            yield callback(array[index], index, array);
+        }
+    });
+}
+function pauseDownload(msg) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, msg || 1000);
+    });
+}
+function checkImage(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        queue = [];
+        const data = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkData(url);
+        const nameArtist = data.body.userName;
+        const count = data.body.pageCount;
+        const urlFromAPI = data.body.urls.original;
+        queueCountEveryArtworkHadBeenChoosed.push(urlFromAPI);
+        if (data.body.pageCount <= 1) {
+            const responseafterdownload = yield getUrlAfterDownload(urlFromAPI, nameArtist);
+            createProcess(responseafterdownload, nameArtist, urlFromAPI);
+        }
+        else {
+            for (let i = 0; i < count; i++) {
+                const url = `${urlFromAPI}`.replace("_p0", `_p${i}`);
+                const responseafterdownload = yield getUrlAfterDownload(url, nameArtist);
+                queue.push(responseafterdownload);
+            }
+            // limit batch download to 10 image
+            asyncEachUrl(queue, (artwork) => {
+                createProcess(artwork, nameArtist, urlFromAPI);
+            });
+        }
+    });
+}
+function waitToDownloadAgain(delay) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, delay);
+    });
+}
+const fetchOptions = {
+    method: "get",
+    credentials: "same-origin",
+    headers: myHeaders,
+};
+function getRetryDownload(newurl, delay, tries, fetchOptions) {
+    function onError(err) {
+        let triesLeft = tries - 1;
+        if (!triesLeft) {
+            throw new Error(err);
+        }
+        return waitToDownloadAgain(delay).then(() => getRetryDownload(newurl, delay, triesLeft, fetchOptions));
+    }
+    return fetch(newurl, fetchOptions).catch(onError);
+}
+function getUrlAfterDownload(newurl, filename) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const responseafterdownload = yield fetch(newurl, {
+            method: "get",
+            credentials: "same-origin",
+            headers: myHeaders,
+        }).catch((e) => __awaiter(this, void 0, void 0, function* () {
+            chrome.runtime.sendMessage({ notification: `reload-extension"` });
+            const responseafterdownload = yield getRetryDownload(newurl, 3000, 5, fetchOptions);
+            return responseafterdownload;
+        }));
+        return responseafterdownload;
+    });
+}
+function sendDownload(urlInput, filename) {
+    chrome.runtime.sendMessage({
+        notification: "download-filename",
+        url: urlInput,
+        filename: filename,
     });
 }
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -588,12 +620,12 @@ chrome.storage.local.get("arrUrl1", function (res) {
             const response = res.arrUrl1.map((url) => {
                 return downloadImage(url);
             });
-            // await new Promise((resolve) => {
-            //   setTimeout(() => {
-            //     chrome.runtime.sendMessage({ notification: "Close" });
-            //     resolve();
-            //   }, 2000);
-            // });
+            yield new Promise((resolve) => {
+                setTimeout(() => {
+                    chrome.runtime.sendMessage({ notification: "Close" });
+                    resolve();
+                }, 2000);
+            });
             yield Promise.all(response);
         }
     });

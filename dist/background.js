@@ -115,7 +115,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
+const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
 class checkURL {
     static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {

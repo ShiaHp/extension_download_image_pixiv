@@ -1,6 +1,6 @@
 import { API } from "./api";
 
-export const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}/;
+export const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
 
 export class checkURL {
   static async getDatafromRequest(url: string): Promise<any> {

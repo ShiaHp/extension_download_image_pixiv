@@ -38,7 +38,8 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*"],
+    
+      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*","*://pbs.twimg.com/*"],
       "js": [
         "contentScript.js"
       ]

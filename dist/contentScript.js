@@ -102,6 +102,7 @@ class API {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "idReg": () => (/* binding */ idReg),
+/* harmony export */   "idTweet": () => (/* binding */ idTweet),
 /* harmony export */   "checkURL": () => (/* binding */ checkURL)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
@@ -116,6 +117,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
+const idTweet = /[0-9]{19}|[0-9]{20}|[0-9]{21}/;
 class checkURL {
     static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -608,9 +610,37 @@ function sendDownload(urlInput, filename) {
         filename: filename,
     });
 }
+function downloadImageFromTwitter(url, msg = 'undifined') {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log('HI');
+        return new Promise((resolve, reject) => {
+            fetch(url, {
+                method: "get",
+            })
+                .then((response) => response.blob())
+                .then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.style.display = "none";
+                a.href = url;
+                a.download = `twitter-${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(url);
+            }).then(() => {
+                if (msg === "undifined") {
+                    console.log("Shiawase ハンサム ");
+                }
+                else {
+                    chrome.runtime.sendMessage({ notification: "Close" });
+                }
+            });
+        });
+    });
+}
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => __awaiter(void 0, void 0, void 0, function* () {
     if (res.length > 0) {
-        downloadImage(res, "Download");
+        downloadImageFromTwitter(res, 'Close');
     }
 }));
 chrome.storage.local.get("arrUrl1", function (res) {

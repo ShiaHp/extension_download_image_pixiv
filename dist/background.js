@@ -102,6 +102,7 @@ class API {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "idReg": () => (/* binding */ idReg),
+/* harmony export */   "idTweet": () => (/* binding */ idTweet),
 /* harmony export */   "checkURL": () => (/* binding */ checkURL)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
@@ -116,6 +117,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
+const idTweet = /[0-9]{19}|[0-9]{20}|[0-9]{21}/;
 class checkURL {
     static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -360,6 +362,15 @@ const functionDownloadImage = (id) => __awaiter(void 0, void 0, void 0, function
         }
     });
 });
+const functionDownloadImageFromTwitter = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    yield fetch(` https://gettweet.onrender.com/tweet/${id}`).then((response) => response.json()).then((data) => {
+        chrome.tabs.create({
+            active: false,
+            url: Object.values(data)[0],
+        });
+        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setImageUrlOriginalStorage)(Object.values(data)[0]);
+    });
+});
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         contexts: ["selection", "link"],
@@ -374,6 +385,8 @@ chrome.contextMenus.onClicked.addListener((event) => {
     else {
         const urlPixiv = event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idReg)[0];
         functionDownloadImage(urlPixiv);
+        const urlTweet = event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idTweet)[0];
+        functionDownloadImageFromTwitter(urlTweet);
     }
 });
 chrome.runtime.onMessage.addListener(function (request) {

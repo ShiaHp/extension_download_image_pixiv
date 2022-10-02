@@ -1,4 +1,4 @@
-import { idReg } from "./../utils/checkUrl";
+import { idReg, idTweet } from "./../utils/checkUrl";
 // TODO: background script
 import {
   setStoredSingle,
@@ -72,7 +72,16 @@ const functionDownloadImage = async (id: string) => {
     }
   });
 };
+const functionDownloadImageFromTwitter = async (id: string) => {
+  await fetch(` https://gettweet.onrender.com/tweet/${id}`).then((response) => response.json()).then((data) => {
+    chrome.tabs.create({
+      active: false,
+      url:  Object.values(data)[0] as string,
+    });
+    setImageUrlOriginalStorage(Object.values(data)[0]  as string);
+  })
 
+}
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     contexts: ["selection", "link"],
@@ -81,16 +90,18 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
 });
-
 chrome.contextMenus.onClicked.addListener((event) => {
   if (event.selectionText) {
     functionDownloadImage(event.selectionText);
   } else {
     const urlPixiv = event.linkUrl.match(idReg)[0];
     functionDownloadImage(urlPixiv);
+    const urlTweet = event.linkUrl.match(idTweet)[0]
+    functionDownloadImageFromTwitter(urlTweet)
+     
+    
   }
 });
-
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
   if (request.notification === "Close")
@@ -121,13 +132,13 @@ chrome.runtime.onMessage.addListener(function (request) {
     });
   }
 
-  if(request.notification === "download-filename"){
+  if (request.notification === "download-filename") {
     chrome.downloads.download({
-      url : request.url,
-      filename : `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
+      url: request.url,
+      filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
       conflictAction: 'overwrite',
       saveAs: false,
     })
-    
+
   }
 });

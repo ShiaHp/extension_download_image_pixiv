@@ -1,7 +1,7 @@
 import { API } from "./api";
 
 export const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
-
+export const idTweet= /[0-9]{19}|[0-9]{20}|[0-9]{21}/
 export class checkURL {
   static async getDatafromRequest(url: string): Promise<any> {
     const id = url.match(idReg)[0];

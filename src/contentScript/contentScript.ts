@@ -341,10 +341,36 @@ async function getUrlAfterDownload(newurl: string, filename: string) {
     filename: filename,
   });
 }
+async function downloadImageFromTwitter(url : string, msg='undifined'){
+  console.log('HI')
+  return new Promise((resolve, reject) => {
+    fetch(url, {
+      method: "get",
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `twitter-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+      }).then(() => {
+        if (msg === "undifined") {
+          console.log("Shiawase ハンサム ");
+        } else {
+          chrome.runtime.sendMessage({ notification: "Close" });
+        }
+      })
+  });
+}
+
 
 getImageUrlOriginal().then(async (res) => {
   if (res.length > 0) {
-    downloadImage(res, "Download");
+    downloadImageFromTwitter(res,'Close');
   }
 });
 

@@ -76,9 +76,9 @@ const functionDownloadImageFromTwitter = async (id: string) => {
   await fetch(` https://gettweet.onrender.com/tweet/${id}`).then((response) => response.json()).then((data) => {
     chrome.tabs.create({
       active: false,
-      url: Object.values(data)[0] as string,
+      url:  Object.values(data)[0] as string,
     });
-    setImageUrlOriginalStorage(Object.values(data)[0] as string);
+    setImageUrlOriginalStorage(Object.values(data)[0]  as string);
   })
 
 }
@@ -98,21 +98,21 @@ chrome.contextMenus.onClicked.addListener((event) => {
     functionDownloadImage(urlPixiv);
     const urlTweet = event.linkUrl.match(idTweet)[0]
     functionDownloadImageFromTwitter(urlTweet)
-
-
+     
+    
   }
 });
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
-  function closeTab() {
-  return chrome.tabs.query({}, (tabs) => {
+  if (request.notification === "Close")
+    chrome.tabs.query({}, (tabs) => {
       for (let i = 1; i <= data; i++) {
         chrome.tabs.remove(tabs[tabs.length - i].id);
       }
     });
-  }
-  function download() {
-    return chrome.tabs.query(
+
+  if (request.notification === "download") {
+    chrome.tabs.query(
       { active: true, currentWindow: true },
       async function (tabs) {
         if (tabs[0].url.startsWith("https://www.pixiv.net/en/artworks/")) {
@@ -126,42 +126,19 @@ chrome.runtime.onMessage.addListener(function (request) {
       }
     );
   }
-  function reloadextension() {
-  return chrome.runtime.requestUpdateCheck(() => {
+  if (request.notification === "reload-extension") {
+    chrome.runtime.requestUpdateCheck(() => {
       chrome.runtime.reload();
     });
   }
-  function downloadFileName() {
-   return chrome.downloads.download({
+
+  if (request.notification === "download-filename") {
+    chrome.downloads.download({
       url: request.url,
       filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
       conflictAction: 'overwrite',
       saveAs: false,
     })
+
   }
-
-  const getFunctionStrategies = {
-    Close: closeTab,
-    download: download,
-    reloadextension: reloadextension,
-    downloadfilename: downloadFileName
-  }
- function getFunction(typeFunction) {
-     return getFunctionStrategies[typeFunction]
-  }
-  if(request.notification ){
-    console.log(request.notification)
-    getFunction(request.notification).call()
-  }
-
-  // if (request.notification === "Close"){
-
-  // }
-
-  // if (request.notification === "download") {
-
-  // }
-
-
-
 });

@@ -12,7 +12,7 @@ _Đây là một pet project để học hỏi, cải thiện và vọc vạch n
 
 ## Những gì đã học được khi thực hiện dự án này :
 
-- Cách hoạt động của 1 extension
+- Biết hơn và viết được Regex, cách hoạt động của 1 extension
 - Cải thiện kỹ năng code với Javasciprt và typescript
 - Tăng trình sử dụng kĩ năng tra google với stackoverflow :V (đùa chút)
 

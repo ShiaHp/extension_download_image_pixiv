@@ -347,7 +347,7 @@ function downloadImage(url, msg = "undifined") {
             .catch((e) => {
             downloadImage(url);
             resolve(e);
-            chrome.runtime.sendMessage({ notification: "reloadextension" });
+            chrome.runtime.sendMessage({ notification: `reload-extension"` });
         });
     });
 }
@@ -596,7 +596,7 @@ function getUrlAfterDownload(newurl, filename) {
             credentials: "same-origin",
             headers: myHeaders,
         }).catch((e) => __awaiter(this, void 0, void 0, function* () {
-            chrome.runtime.sendMessage({ notification: `reloadextension"` });
+            chrome.runtime.sendMessage({ notification: `reload-extension"` });
             const responseafterdownload = yield getRetryDownload(newurl, 3000, 5, fetchOptions);
             return responseafterdownload;
         }));
@@ -605,14 +605,15 @@ function getUrlAfterDownload(newurl, filename) {
 }
 function sendDownload(urlInput, filename) {
     chrome.runtime.sendMessage({
-        notification: "downloadfilename",
+        notification: "download-filename",
         url: urlInput,
         filename: filename,
     });
 }
 function downloadImageFromTwitter(url, msg = 'undifined') {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(() => {
+        console.log('HI');
+        return new Promise((resolve, reject) => {
             fetch(url, {
                 method: "get",
             })

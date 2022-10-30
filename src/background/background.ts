@@ -1,4 +1,4 @@
-import { idReg, idTweet } from "./../utils/checkUrl";
+import { idReg, idTweet, check, format_twitter, format_pixiv } from "./../utils/checkUrl";
 // TODO: background script
 import {
   setStoredSingle,
@@ -7,8 +7,7 @@ import {
   setImageUrlStorage,
   setImageUrlOriginalStorage,
 } from "../utils/storage";
-import { API } from "../utils/api";
-import { checkURL } from "../utils/checkUrl";
+import { API, ArtworkData } from "../utils/api";
 const regex = /access-control-allow-origin/i;
 
 function removeMatchingHeaders(
@@ -43,45 +42,58 @@ chrome.webRequest.onHeadersReceived.addListener(
   ["blocking", "responseHeaders", "extraHeaders"]
 );
 
-const functionDownloadImage = async (id: string) => {
-  await API.getArtwordData(id).then((data) => {
-    if (data.body.pageCount <= 1) {
-      chrome.tabs.create({
-        active: false,
-        url: data.body.urls.original,
-      });
-      setImageUrlOriginalStorage(data.body.urls.original);
-    } else {
-      const imgList = [];
-      for (let i = 0; i < data.body.pageCount; i++) {
-        const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
-        imgList.push(url);
-      }
-      chrome.storage.local.set({ arrUrl1: imgList }, () => {
-        chrome.tabs.query({}, async (tabs) => {
-
-          chrome.tabs.create(
-            {
-              active: false,
-              url: data.body.urls.original,
-            },
-          );
-
-        });
-      });
-    }
-  });
-};
-const functionDownloadImageFromTwitter = async (id: string) => {
-  await fetch(` https://gettweet.onrender.com/tweet/${id}`).then((response) => response.json()).then((data) => {
-    chrome.tabs.create({
-      active: false,
-      url:  Object.values(data)[0] as string,
+const callAPI = async (id: string, type: number): Promise<object> => {
+  const apiName = {
+    0: API.getArtwordData(id),
+    1: API.getArtwordDataTwitter(id),
+  }
+  let infoArtwork: object = {};
+  await apiName[type].then((data : object) => {
+      infoArtwork = data;
     });
-    setImageUrlOriginalStorage(Object.values(data)[0]  as string);
-  })
+  return infoArtwork;
+};
 
+const createNewTab = (infoArtwork, type : number) => {
+  const in4toOpen = type == format_pixiv ? infoArtwork.body.urls.original : Object.values(infoArtwork)[0] as string;
+  chrome.tabs.create({
+    active: false,
+    url: in4toOpen,
+  });
+  setImageUrlOriginalStorage(in4toOpen);
 }
+const functionDownloadImage = async (id: string, type: number) => {
+
+  const infoArtwork: ArtworkData = await callAPI(id, type)
+
+  const artworkName = {
+    0: infoArtwork?.body?.pageCount,
+    1: infoArtwork,
+  }
+  if (type === format_twitter || artworkName[type] <=1) {
+    createNewTab(infoArtwork, type)
+  } else  {
+    const imgList = [];
+    for (let i = 0; i < artworkName[type]; i++) {
+      const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
+      imgList.push(url);
+    }
+    chrome.storage.local.set({ arrUrl1: imgList }, () => {
+      chrome.tabs.query({}, async() => {
+        chrome.tabs.create(
+          {
+            active: false,
+            url: infoArtwork.body.urls.original,
+          },
+        );
+
+      });
+    });
+  }
+}
+
+
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     contexts: ["selection", "link"],
@@ -92,14 +104,11 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 chrome.contextMenus.onClicked.addListener((event) => {
   if (event.selectionText) {
-    functionDownloadImage(event.selectionText);
+    functionDownloadImage(event.selectionText, format_pixiv );
   } else {
-    const urlPixiv = event.linkUrl.match(idReg)[0];
-    functionDownloadImage(urlPixiv);
-    const urlTweet = event.linkUrl.match(idTweet)[0]
-    functionDownloadImageFromTwitter(urlTweet)
-     
-    
+    const typeToCheck: number = check.checkName(event.linkUrl)
+    const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idReg)[0] : event.linkUrl.match(idTweet)[0]
+    functionDownloadImage(exactName, typeToCheck);
   }
 });
 chrome.runtime.onMessage.addListener(function (request) {
@@ -111,21 +120,7 @@ chrome.runtime.onMessage.addListener(function (request) {
       }
     });
 
-  if (request.notification === "download") {
-    chrome.tabs.query(
-      { active: true, currentWindow: true },
-      async function (tabs) {
-        if (tabs[0].url.startsWith("https://www.pixiv.net/en/artworks/")) {
-          const id = tabs[0].url.split("https://www.pixiv.net/en/artworks/")[1];
-          functionDownloadImage(id);
-          chrome.runtime.sendMessage(
-            { notification: "close-window" },
-            () => { }
-          );
-        }
-      }
-    );
-  }
+
   if (request.notification === "reload-extension") {
     chrome.runtime.requestUpdateCheck(() => {
       chrome.runtime.reload();

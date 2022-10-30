@@ -3,7 +3,7 @@ export interface DataFromPixiv {
   manga?: number[];
 }
 export interface ArtworkData {
-  body: {
+  body?: {
     illustId: number;
     illustTitle: string;
     urls: {
@@ -14,8 +14,7 @@ export interface ArtworkData {
     pageCount : number
   };
 }
-const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
+export const myHeaders = new Headers();
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
 const requestOptions = {
@@ -26,7 +25,6 @@ const requestOptions = {
 export class API {
   static sendGetRequest<T>(url: string): Promise<T> {
     return new Promise((resolve, reject) => {
-    
         fetch(url,  {
           method: 'get',
           credentials: 'same-origin'
@@ -62,7 +60,10 @@ export class API {
     const url = `https://www.pixiv.net/ajax/user/${id}/${type}/bookmarks?tag=&offset=${offset}&limit=${limit}&rest=show&lang=en`;
     return this.sendGetRequest(url);
   }
-
+  static async getArtwordDataTwitter(id: string) : Promise<any> {
+    const url = ` https://gettweet.onrender.com/tweet/${id}`
+    return this.sendGetRequest(url);
+  }
   static getArtwordData(id: any): Promise<ArtworkData> {
     const url = `https://www.pixiv.net/ajax/illust/${id}`;
     return this.sendGetRequest(url);

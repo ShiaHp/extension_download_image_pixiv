@@ -10,6 +10,7 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "myHeaders": () => (/* binding */ myHeaders),
 /* harmony export */   "API": () => (/* binding */ API)
 /* harmony export */ });
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -22,7 +23,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
 const requestOptions = {
@@ -58,6 +58,12 @@ class API {
     static getBookMarkOfUser(id, type = "illusts", offset, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = `https://www.pixiv.net/ajax/user/${id}/${type}/bookmarks?tag=&offset=${offset}&limit=${limit}&rest=show&lang=en`;
+            return this.sendGetRequest(url);
+        });
+    }
+    static getArtwordDataTwitter(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = ` https://gettweet.onrender.com/tweet/${id}`;
             return this.sendGetRequest(url);
         });
     }
@@ -103,7 +109,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "idReg": () => (/* binding */ idReg),
 /* harmony export */   "idTweet": () => (/* binding */ idTweet),
-/* harmony export */   "checkURL": () => (/* binding */ checkURL)
+/* harmony export */   "format_pixiv": () => (/* binding */ format_pixiv),
+/* harmony export */   "format_twitter": () => (/* binding */ format_twitter),
+/* harmony export */   "checkURL": () => (/* binding */ checkURL),
+/* harmony export */   "check": () => (/* binding */ check),
+/* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
+/* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
+/* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
+/* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
+/* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -116,8 +130,10 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
-const idTweet = /[0-9]{19}|[0-9]{20}|[0-9]{21}/;
+const idReg = /[0-9]{7,11}/;
+const idTweet = /[0-9]{19,21}/;
+const format_pixiv = 0;
+const format_twitter = 1;
 class checkURL {
     static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -131,7 +147,111 @@ class checkURL {
             return this.getDatafromRequest(url).then((data) => data);
         });
     }
+    static classifiedPageCount(data) {
+        var _a;
+        const urlArr = [];
+        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 || data) {
+            urlArr.push(data);
+        }
+        else {
+            for (let i = 0; i < data.body.pageCount; i++) {
+                const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+                urlArr.push(url);
+            }
+        }
+        return urlArr;
+    }
 }
+class check {
+    static checkName(name) {
+        let isPixiv = name.indexOf("pixiv") > -1;
+        if (isPixiv) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+}
+const buttonDownloadAllCss = `
+.style {
+  zIndex : 9999;
+  background-color: #52e010;
+  border-radius : 5px;
+  font-size : 18px;
+  align-content : center;
+  color : #fff;
+  position : fixed;
+  right : 0;
+  bottom : 350px;
+  padding : 0.5rem;
+  margin : 0.5rem 0.5rem 0.5rem 0;
+  transition : 0.2s all;
+  cursor : pointer;
+  transform : scale(0.98);
+  box-shadow : 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+  }
+`;
+const checkboxCss = `
+.stylecheckbox {
+  z-index : 9998;
+  font-size : 20px;
+  position : absolute;
+  border-radius : 5px;
+  top : 0px;
+  left : 0px;
+  height : 25px;
+  width : 25px;
+  background-color : rgba(255, 255, 255, 0.5rem);
+}
+`;
+const buttonCss = `
+.buttonCss {
+z-index : 9999;
+background-color: #52e010;
+border-radius : 5px;
+font-size : 18px;
+align-content: center;
+color :  #fff;
+position : absolute;
+right : 0;
+top : 1rem;
+padding : 0.5rem;
+margin : 0.5rem 0.5rem 0.5rem 0;
+transition : 0.2s all;
+cursor : pointer;
+transform : scale(0.98);
+opacity : 0.5rem;
+box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+`;
+const myProgresscss = `
+.myProgress {
+ width : 100px;
+ height : 10px;
+ backgroundColor : #ddd;
+ display : none;
+ 
+ zIndex : 1000;
+
+ position : fixed;
+ right : 0;
+ bottom : 0;
+ padding : 0.5rem;
+ margin : 0.5rem 0.5rem 0.5rem 0;
+ display : block;
+  
+}
+`;
+const processBarcss = `
+  .processBar {
+   background-color : #04AA6D;
+  font-size :15px;
+  width : 10%;
+  height : 10px;
+  display : block;
+  }
+`;
 
 
 /***/ }),
@@ -315,15 +435,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const myHeaders = new Headers();
-myHeaders.append("sec-fetch-site", "cross-site");
-myHeaders.append("referer", "https://www.pixiv.net/");
 function downloadImage(url, msg = "undifined") {
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: "get",
             credentials: "same-origin",
-            headers: myHeaders,
+            headers: _utils_api__WEBPACK_IMPORTED_MODULE_0__.myHeaders,
         })
             .then((response) => response.blob())
             .then((blob) => {
@@ -331,14 +448,14 @@ function downloadImage(url, msg = "undifined") {
             const a = document.createElement("a");
             a.style.display = "none";
             a.href = url;
-            a.download = `pixiv-${Date.now()}.jpg`;
+            a.download = `Ex-${Date.now()}.jpg`;
             document.body.appendChild(a);
             a.click();
             URL.revokeObjectURL(url);
         })
             .then(() => {
             if (msg === "undifined") {
-                console.log("Shiawase ハンサム ");
+                return;
             }
             else {
                 chrome.runtime.sendMessage({ notification: "Close" });
@@ -385,35 +502,18 @@ setInterval(() => {
             imagesArray[i].parentElement.childNodes &&
             imagesArray[i].parentElement.childNodes.length <= 1) {
             const checkbox = document.createElement("input");
+            const style = document.createElement("style");
+            style.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkboxCss;
+            checkbox.className = "stylecheckbox";
             checkbox.type = "checkbox";
             checkbox.id = "checkbox";
-            checkbox.style.fontSize = "20px";
-            checkbox.style.position = "absolute";
-            checkbox.style.borderRadius = "5px";
-            checkbox.style.zIndex = "9998";
-            checkbox.style.top = "0px";
-            checkbox.style.left = "0px";
-            checkbox.style.height = "25px";
-            checkbox.style.width = "25px";
-            checkbox.style.backgroundColor = "rgba(255, 255, 255, 0.5rem)";
+            body.appendChild(style);
             const button = document.createElement("button");
             button.innerText = "\u21E9";
-            button.style.zIndex = "9999";
-            button.style.backgroundColor = "#52e010";
-            button.style.borderRadius = "5px";
-            button.style.fontSize = "18px";
-            button.style.alignContent = "center";
-            button.style.color = " #fff";
-            button.style.position = "absolute";
-            button.style.right = "0";
-            button.style.top = "1rem";
-            button.style.padding = "0.5rem";
-            button.style.margin = "0.5rem 0.5rem 0.5rem 0";
-            button.style.transition = "0.2s all";
-            button.style.cursor = "pointer";
-            button.style.transform = "scale(0.98)";
-            button.style.opacity = "0.5rem";
-            button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+            const stylebutton = document.createElement("style");
+            stylebutton.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.buttonCss;
+            button.className = "buttonCss";
+            body.appendChild(stylebutton);
             checkbox.addEventListener("click", function (e) {
                 e.stopPropagation();
                 const id = e.path[1].innerHTML.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.idReg)[0];
@@ -448,18 +548,12 @@ buttonDownloadAll.addEventListener("click", function (e) {
             Array.from(document.querySelectorAll("input[type=checkbox]")).forEach((el) => (el.checked = isAllCheck));
             for (let i = 0; i < imgIdArr.length; i++) {
                 const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(imgIdArr[i]);
-                if (data.body.pageCount <= 1) {
-                    urlArr.push(data.body.urls.original);
-                }
-                else {
-                    for (let i = 0; i < data.body.pageCount; i++) {
-                        const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
-                        urlArr.push(url);
-                    }
-                }
+                urlArr.push(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.classifiedPageCount(data));
             }
-            const response = urlArr.map((url) => {
-                return downloadImage(url);
+            const response = urlArr.map(nestedurl => {
+                nestedurl.map(element => {
+                    return downloadImage(element);
+                });
             });
             yield Promise.all(response).then(() => {
                 imgIdArr = [];
@@ -539,11 +633,6 @@ function asyncEachUrl(array, callback) {
         }
     });
 }
-function pauseDownload(msg) {
-    return new Promise((resolve, reject) => {
-        setTimeout(resolve, msg || 1000);
-    });
-}
 function checkImage(url) {
     return __awaiter(this, void 0, void 0, function* () {
         queue = [];
@@ -577,7 +666,7 @@ function waitToDownloadAgain(delay) {
 const fetchOptions = {
     method: "get",
     credentials: "same-origin",
-    headers: myHeaders,
+    headers: _utils_api__WEBPACK_IMPORTED_MODULE_0__.myHeaders,
 };
 function getRetryDownload(newurl, delay, tries, fetchOptions) {
     function onError(err) {
@@ -594,7 +683,7 @@ function getUrlAfterDownload(newurl, filename) {
         const responseafterdownload = yield fetch(newurl, {
             method: "get",
             credentials: "same-origin",
-            headers: myHeaders,
+            headers: _utils_api__WEBPACK_IMPORTED_MODULE_0__.myHeaders,
         }).catch((e) => __awaiter(this, void 0, void 0, function* () {
             chrome.runtime.sendMessage({ notification: `reload-extension"` });
             const responseafterdownload = yield getRetryDownload(newurl, 3000, 5, fetchOptions);
@@ -610,43 +699,14 @@ function sendDownload(urlInput, filename) {
         filename: filename,
     });
 }
-function downloadImageFromTwitter(url, msg = 'undifined') {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log('HI');
-        return new Promise((resolve, reject) => {
-            fetch(url, {
-                method: "get",
-            })
-                .then((response) => response.blob())
-                .then((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.style.display = "none";
-                a.href = url;
-                a.download = `twitter-${Date.now()}.jpg`;
-                document.body.appendChild(a);
-                a.click();
-                URL.revokeObjectURL(url);
-            }).then(() => {
-                if (msg === "undifined") {
-                    console.log("Shiawase ハンサム ");
-                }
-                else {
-                    chrome.runtime.sendMessage({ notification: "Close" });
-                }
-            });
-        });
-    });
-}
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.getImageUrlOriginal)().then((res) => __awaiter(void 0, void 0, void 0, function* () {
     if (res.length > 0) {
-        downloadImageFromTwitter(res, 'Close');
+        downloadImage(res, 'Close');
     }
 }));
 chrome.storage.local.get("arrUrl1", function (res) {
     return __awaiter(this, void 0, void 0, function* () {
         if (res || res.arrUrl1.length > 0) {
-            console.log(res.arrUrl1);
             const response = res.arrUrl1.map((url) => {
                 return downloadImage(url);
             });

@@ -271,6 +271,7 @@ react_dom__WEBPACK_IMPORTED_MODULE_1__.render(react__WEBPACK_IMPORTED_MODULE_0__
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "myHeaders": () => (/* binding */ myHeaders),
 /* harmony export */   "API": () => (/* binding */ API)
 /* harmony export */ });
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -283,7 +284,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
 const requestOptions = {
@@ -319,6 +319,12 @@ class API {
     static getBookMarkOfUser(id, type = "illusts", offset, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = `https://www.pixiv.net/ajax/user/${id}/${type}/bookmarks?tag=&offset=${offset}&limit=${limit}&rest=show&lang=en`;
+            return this.sendGetRequest(url);
+        });
+    }
+    static getArtwordDataTwitter(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = ` https://gettweet.onrender.com/tweet/${id}`;
             return this.sendGetRequest(url);
         });
     }

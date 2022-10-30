@@ -34,7 +34,7 @@ const App: React.FC<{}> = () => {
 
             await Promise.all(response)
               .then((files) => {
-                files.forEach((file) => {
+                files.forEach((file : ArtworkData) => {
                   if (file.body.pageCount <= 1) {
                     imgList.push(file.body.urls.original);
                   } else {
@@ -133,7 +133,7 @@ const App: React.FC<{}> = () => {
     <Box mx="9px" my="16px">
       <Grid container spacing={2}>
         <Grid item>
-          <Button onClick={getUrl} style={cssButton }>
+          <Button onClick={getUrl} style = {cssButton} >
             get the info about artist{" "}
           </Button>
           <InputBase

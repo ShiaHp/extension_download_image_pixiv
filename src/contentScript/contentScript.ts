@@ -1,13 +1,11 @@
-import { API } from "../utils/api";
+import { API,myHeaders  } from "../utils/api";
 import {
   getImageUrl,
   clearImageUrl,
   getImageUrlOriginal,
 } from "../utils/storage";
-import { checkURL, idReg } from "../utils/checkUrl";
-const myHeaders = new Headers();
-myHeaders.append("sec-fetch-site", "cross-site");
-myHeaders.append("referer", "https://www.pixiv.net/");
+import { checkURL, idReg,checkboxCss ,buttonCss} from "../utils/checkUrl";
+
 function downloadImage(url: string, msg = "undifined") {
   return new Promise((resolve, reject) => {
     fetch(url, {
@@ -21,14 +19,14 @@ function downloadImage(url: string, msg = "undifined") {
         const a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
-        a.download = `pixiv-${Date.now()}.jpg`;
+        a.download = `Ex-${Date.now()}.jpg`;
         document.body.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
       })
       .then(() => {
         if (msg === "undifined") {
-          console.log("Shiawase ハンサム ");
+              return 
         } else {
           chrome.runtime.sendMessage({ notification: "Close" });
         }
@@ -81,40 +79,22 @@ setInterval(() => {
       imagesArray[i].parentElement.childNodes.length <= 1
     ) {
       const checkbox = document.createElement("input");
+      const style = document.createElement("style");
+      style.innerHTML = checkboxCss
+      checkbox.className = "stylecheckbox"
       checkbox.type = "checkbox";
       checkbox.id = "checkbox";
-
-      checkbox.style.fontSize = "20px";
-      checkbox.style.position = "absolute";
-      checkbox.style.borderRadius = "5px";
-      checkbox.style.zIndex = "9998";
-      checkbox.style.top = "0px";
-      checkbox.style.left = "0px";
-      checkbox.style.height = "25px";
-      checkbox.style.width = "25px";
-      checkbox.style.backgroundColor = "rgba(255, 255, 255, 0.5rem)";
+      body.appendChild(style)
+    
 
       const button = document.createElement("button");
       button.innerText = "\u21E9";
-      button.style.zIndex = "9999";
-      button.style.backgroundColor = "#52e010";
-      button.style.borderRadius = "5px";
-      button.style.fontSize = "18px";
-      button.style.alignContent = "center";
-      button.style.color = " #fff";
-      button.style.position = "absolute";
-      button.style.right = "0";
-      button.style.top = "1rem";
-      button.style.padding = "0.5rem";
-      button.style.margin = "0.5rem 0.5rem 0.5rem 0";
-      button.style.transition = "0.2s all";
-      button.style.cursor = "pointer";
-      button.style.transform = "scale(0.98)";
-      button.style.opacity = "0.5rem";
+      const stylebutton = document.createElement("style");
+      stylebutton.innerHTML = buttonCss
+      button.className = "buttonCss"
+      body.appendChild(stylebutton)
 
-      button.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
-
-      checkbox.addEventListener("click", function (e) {
+      checkbox.addEventListener("click", function (e : any) {
         e.stopPropagation();
 
         const id = e.path[1].innerHTML.match(idReg)[0];
@@ -149,22 +129,19 @@ buttonDownloadAll.addEventListener("click", async function (e) {
 
     const isAllCheck = false;
     Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
-      (el) => (el.checked = isAllCheck)
+      (el : any) => (el.checked = isAllCheck)
     );
     for (let i = 0; i < imgIdArr.length; i++) {
       const data = await API.getArtwordData(imgIdArr[i]);
-      if (data.body.pageCount <= 1) {
-        urlArr.push(data.body.urls.original);
-      } else {
-        for (let i = 0; i < data.body.pageCount; i++) {
-          const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
-          urlArr.push(url);
-        }
-      }
+      urlArr.push(checkURL.classifiedPageCount(data));
     }
-    const response = urlArr.map((url) => {
-      return downloadImage(url);
-    });
+ 
+    const response = urlArr.map(nestedurl => {
+        nestedurl.map(element => {
+          return downloadImage(element);
+        });
+          })
+  
 
     await Promise.all(response).then(() => {
       imgIdArr = [];
@@ -252,11 +229,7 @@ async function asyncEachUrl(array, callback) {
     await callback(array[index], index, array);
   }
 }
-function pauseDownload(msg) {
-  return new Promise((resolve, reject) => {
-    setTimeout(resolve, msg || 1000);
-  });
-}
+
 async function checkImage(url: string) {
   queue = []
   const data = await checkURL.checkData(url);
@@ -341,46 +314,21 @@ async function getUrlAfterDownload(newurl: string, filename: string) {
     filename: filename,
   });
 }
-async function downloadImageFromTwitter(url : string, msg='undifined'){
-  console.log('HI')
-  return new Promise((resolve, reject) => {
-    fetch(url, {
-      method: "get",
-    })
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = `twitter-${Date.now()}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(url);
-      }).then(() => {
-        if (msg === "undifined") {
-          console.log("Shiawase ハンサム ");
-        } else {
-          chrome.runtime.sendMessage({ notification: "Close" });
-        }
-      })
-  });
-}
-
 
 getImageUrlOriginal().then(async (res) => {
   if (res.length > 0) {
-    downloadImageFromTwitter(res,'Close');
+    downloadImage(res,'Close');
   }
 });
 
 chrome.storage.local.get("arrUrl1", async function (res) {
   if (res || res.arrUrl1.length > 0) {
-    console.log(res.arrUrl1);
+
     const response = res.arrUrl1.map((url) => {
       return downloadImage(url);
     });
-    await new Promise((resolve) => {
+ 
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         chrome.runtime.sendMessage({ notification: "Close" });
         resolve();

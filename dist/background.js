@@ -10,6 +10,7 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "myHeaders": () => (/* binding */ myHeaders),
 /* harmony export */   "API": () => (/* binding */ API)
 /* harmony export */ });
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -22,7 +23,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
 const requestOptions = {
@@ -58,6 +58,12 @@ class API {
     static getBookMarkOfUser(id, type = "illusts", offset, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = `https://www.pixiv.net/ajax/user/${id}/${type}/bookmarks?tag=&offset=${offset}&limit=${limit}&rest=show&lang=en`;
+            return this.sendGetRequest(url);
+        });
+    }
+    static getArtwordDataTwitter(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = ` https://gettweet.onrender.com/tweet/${id}`;
             return this.sendGetRequest(url);
         });
     }
@@ -103,7 +109,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "idReg": () => (/* binding */ idReg),
 /* harmony export */   "idTweet": () => (/* binding */ idTweet),
-/* harmony export */   "checkURL": () => (/* binding */ checkURL)
+/* harmony export */   "format_pixiv": () => (/* binding */ format_pixiv),
+/* harmony export */   "format_twitter": () => (/* binding */ format_twitter),
+/* harmony export */   "checkURL": () => (/* binding */ checkURL),
+/* harmony export */   "check": () => (/* binding */ check),
+/* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
+/* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
+/* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
+/* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
+/* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -116,8 +130,10 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idReg = /[0-9]{9}|[0-9]{8}|[0-9]{10}[0-9]{7}/;
-const idTweet = /[0-9]{19}|[0-9]{20}|[0-9]{21}/;
+const idReg = /[0-9]{7,11}/;
+const idTweet = /[0-9]{19,21}/;
+const format_pixiv = 0;
+const format_twitter = 1;
 class checkURL {
     static getDatafromRequest(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -131,7 +147,111 @@ class checkURL {
             return this.getDatafromRequest(url).then((data) => data);
         });
     }
+    static classifiedPageCount(data) {
+        var _a;
+        const urlArr = [];
+        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 || data) {
+            urlArr.push(data);
+        }
+        else {
+            for (let i = 0; i < data.body.pageCount; i++) {
+                const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+                urlArr.push(url);
+            }
+        }
+        return urlArr;
+    }
 }
+class check {
+    static checkName(name) {
+        let isPixiv = name.indexOf("pixiv") > -1;
+        if (isPixiv) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+}
+const buttonDownloadAllCss = `
+.style {
+  zIndex : 9999;
+  background-color: #52e010;
+  border-radius : 5px;
+  font-size : 18px;
+  align-content : center;
+  color : #fff;
+  position : fixed;
+  right : 0;
+  bottom : 350px;
+  padding : 0.5rem;
+  margin : 0.5rem 0.5rem 0.5rem 0;
+  transition : 0.2s all;
+  cursor : pointer;
+  transform : scale(0.98);
+  box-shadow : 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+  }
+`;
+const checkboxCss = `
+.stylecheckbox {
+  z-index : 9998;
+  font-size : 20px;
+  position : absolute;
+  border-radius : 5px;
+  top : 0px;
+  left : 0px;
+  height : 25px;
+  width : 25px;
+  background-color : rgba(255, 255, 255, 0.5rem);
+}
+`;
+const buttonCss = `
+.buttonCss {
+z-index : 9999;
+background-color: #52e010;
+border-radius : 5px;
+font-size : 18px;
+align-content: center;
+color :  #fff;
+position : absolute;
+right : 0;
+top : 1rem;
+padding : 0.5rem;
+margin : 0.5rem 0.5rem 0.5rem 0;
+transition : 0.2s all;
+cursor : pointer;
+transform : scale(0.98);
+opacity : 0.5rem;
+box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+`;
+const myProgresscss = `
+.myProgress {
+ width : 100px;
+ height : 10px;
+ backgroundColor : #ddd;
+ display : none;
+ 
+ zIndex : 1000;
+
+ position : fixed;
+ right : 0;
+ bottom : 0;
+ padding : 0.5rem;
+ margin : 0.5rem 0.5rem 0.5rem 0;
+ display : block;
+  
+}
+`;
+const processBarcss = `
+  .processBar {
+   background-color : #04AA6D;
+  font-size :15px;
+  width : 10%;
+  height : 10px;
+  display : block;
+  }
+`;
 
 
 /***/ }),
@@ -336,40 +456,50 @@ function responseListener(details) {
 chrome.webRequest.onHeadersReceived.addListener(responseListener, {
     urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
 }, ["blocking", "responseHeaders", "extraHeaders"]);
-const functionDownloadImage = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtwordData(id).then((data) => {
-        if (data.body.pageCount <= 1) {
-            chrome.tabs.create({
-                active: false,
-                url: data.body.urls.original,
-            });
-            (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setImageUrlOriginalStorage)(data.body.urls.original);
-        }
-        else {
-            const imgList = [];
-            for (let i = 0; i < data.body.pageCount; i++) {
-                const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
-                imgList.push(url);
-            }
-            chrome.storage.local.set({ arrUrl1: imgList }, () => {
-                chrome.tabs.query({}, (tabs) => __awaiter(void 0, void 0, void 0, function* () {
-                    chrome.tabs.create({
-                        active: false,
-                        url: data.body.urls.original,
-                    });
-                }));
-            });
-        }
+const callAPI = (id, type) => __awaiter(void 0, void 0, void 0, function* () {
+    const apiName = {
+        0: _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtwordData(id),
+        1: _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtwordDataTwitter(id),
+    };
+    let infoArtwork = {};
+    yield apiName[type].then((data) => {
+        infoArtwork = data;
     });
+    return infoArtwork;
 });
-const functionDownloadImageFromTwitter = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield fetch(` https://gettweet.onrender.com/tweet/${id}`).then((response) => response.json()).then((data) => {
-        chrome.tabs.create({
-            active: false,
-            url: Object.values(data)[0],
-        });
-        (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setImageUrlOriginalStorage)(Object.values(data)[0]);
+const createNewTab = (infoArtwork, type) => {
+    const in4toOpen = type == _utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.format_pixiv ? infoArtwork.body.urls.original : Object.values(infoArtwork)[0];
+    chrome.tabs.create({
+        active: false,
+        url: in4toOpen,
     });
+    (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setImageUrlOriginalStorage)(in4toOpen);
+};
+const functionDownloadImage = (id, type) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const infoArtwork = yield callAPI(id, type);
+    const artworkName = {
+        0: (_a = infoArtwork === null || infoArtwork === void 0 ? void 0 : infoArtwork.body) === null || _a === void 0 ? void 0 : _a.pageCount,
+        1: infoArtwork,
+    };
+    if (type === _utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.format_twitter || artworkName[type] <= 1) {
+        createNewTab(infoArtwork, type);
+    }
+    else {
+        const imgList = [];
+        for (let i = 0; i < artworkName[type]; i++) {
+            const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
+            imgList.push(url);
+        }
+        chrome.storage.local.set({ arrUrl1: imgList }, () => {
+            chrome.tabs.query({}, () => __awaiter(void 0, void 0, void 0, function* () {
+                chrome.tabs.create({
+                    active: false,
+                    url: infoArtwork.body.urls.original,
+                });
+            }));
+        });
+    }
 });
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
@@ -380,13 +510,12 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 chrome.contextMenus.onClicked.addListener((event) => {
     if (event.selectionText) {
-        functionDownloadImage(event.selectionText);
+        functionDownloadImage(event.selectionText, _utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.format_pixiv);
     }
     else {
-        const urlPixiv = event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idReg)[0];
-        functionDownloadImage(urlPixiv);
-        const urlTweet = event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idTweet)[0];
-        functionDownloadImageFromTwitter(urlTweet);
+        const typeToCheck = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.check.checkName(event.linkUrl);
+        const exactName = typeToCheck == _utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.format_pixiv ? event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idReg)[0] : event.linkUrl.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_0__.idTweet)[0];
+        functionDownloadImage(exactName, typeToCheck);
     }
 });
 chrome.runtime.onMessage.addListener(function (request) {
@@ -397,17 +526,6 @@ chrome.runtime.onMessage.addListener(function (request) {
                 chrome.tabs.remove(tabs[tabs.length - i].id);
             }
         });
-    if (request.notification === "download") {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (tabs[0].url.startsWith("https://www.pixiv.net/en/artworks/")) {
-                    const id = tabs[0].url.split("https://www.pixiv.net/en/artworks/")[1];
-                    functionDownloadImage(id);
-                    chrome.runtime.sendMessage({ notification: "close-window" }, () => { });
-                }
-            });
-        });
-    }
     if (request.notification === "reload-extension") {
         chrome.runtime.requestUpdateCheck(() => {
             chrome.runtime.reload();

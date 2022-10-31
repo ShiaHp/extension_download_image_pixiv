@@ -116,6 +116,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
 /* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
 /* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
+/* harmony export */   "myImagecss": () => (/* binding */ myImagecss),
 /* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
 /* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
 /* harmony export */ });
@@ -150,7 +151,7 @@ class checkURL {
     static classifiedPageCount(data) {
         var _a;
         const urlArr = [];
-        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 || data) {
+        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 && data) {
             urlArr.push(data);
         }
         else {
@@ -174,14 +175,14 @@ class check {
     }
 }
 const buttonDownloadAllCss = `
-.style {
+.styleButtonAll{
   zIndex : 9999;
   background-color: #52e010;
   border-radius : 5px;
   font-size : 18px;
   align-content : center;
-  color : #fff;
   position : fixed;
+  color : #fff;
   right : 0;
   bottom : 350px;
   padding : 0.5rem;
@@ -224,6 +225,15 @@ transform : scale(0.98);
 opacity : 0.5rem;
 box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
+`;
+const myImagecss = `
+.myImage {
+  borderRadius : 5px;
+  border : 1px solid black;
+  padding : 5px;
+  width : 150px;
+}
+
 `;
 const myProgresscss = `
 .myProgress {
@@ -520,24 +530,37 @@ chrome.contextMenus.onClicked.addListener((event) => {
 });
 chrome.runtime.onMessage.addListener(function (request) {
     const data = request.data || 1;
-    if (request.notification === "Close")
-        chrome.tabs.query({}, (tabs) => {
+    function closeTab() {
+        return chrome.tabs.query({}, (tabs) => {
             for (let i = 1; i <= data; i++) {
                 chrome.tabs.remove(tabs[tabs.length - i].id);
             }
         });
-    if (request.notification === "reload-extension") {
-        chrome.runtime.requestUpdateCheck(() => {
+    }
+    function reloadextension() {
+        return chrome.runtime.requestUpdateCheck(() => {
             chrome.runtime.reload();
         });
     }
-    if (request.notification === "download-filename") {
-        chrome.downloads.download({
+    function downloadFileName() {
+        return chrome.downloads.download({
             url: request.url,
             filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
             conflictAction: 'overwrite',
             saveAs: false,
         });
+    }
+    const getFunctionStrategies = {
+        Close: closeTab,
+        reloadextension: reloadextension,
+        downloadfilename: downloadFileName
+    };
+    function getFunction(typeFunction) {
+        return getFunctionStrategies[typeFunction];
+    }
+    if (request.notification) {
+        console.log(request.notification);
+        getFunction(request.notification).call();
     }
 });
 

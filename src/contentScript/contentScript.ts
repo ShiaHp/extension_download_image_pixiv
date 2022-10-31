@@ -1,10 +1,11 @@
-import { API,myHeaders  } from "../utils/api";
+import { ArtworkData } from './../utils/api';
+import { API, myHeaders } from "../utils/api";
 import {
   getImageUrl,
   clearImageUrl,
   getImageUrlOriginal,
 } from "../utils/storage";
-import { checkURL, idReg,checkboxCss ,buttonCss} from "../utils/checkUrl";
+import { checkURL, idReg, checkboxCss, buttonCss, myImagecss, buttonDownloadAllCss } from "../utils/checkUrl";
 
 function downloadImage(url: string, msg = "undifined") {
   return new Promise((resolve, reject) => {
@@ -26,7 +27,7 @@ function downloadImage(url: string, msg = "undifined") {
       })
       .then(() => {
         if (msg === "undifined") {
-              return 
+          return
         } else {
           chrome.runtime.sendMessage({ notification: "Close" });
         }
@@ -34,40 +35,28 @@ function downloadImage(url: string, msg = "undifined") {
       .catch((e) => {
         downloadImage(url);
         resolve(e);
-        chrome.runtime.sendMessage({ notification: `reload-extension"` });
+        chrome.runtime.sendMessage({ notification: `reloadextension"` });
       });
   });
 }
 
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
-
 let myImage = document.createElement("img") as HTMLImageElement;
-myImage.style.borderRadius = "5px";
-myImage.style.border = "1px solid black";
-myImage.style.padding = "5px";
-myImage.style.width = "150px";
+const styleImage = document.createElement("style");
+styleImage.innerHTML = checkboxCss
+myImage.className = "myImage"
+
 const buttonDownloadAll = document.createElement("button");
 buttonDownloadAll.innerHTML = "Download all";
-buttonDownloadAll.style.zIndex = "9999";
-buttonDownloadAll.style.backgroundColor = "#52e010";
-buttonDownloadAll.style.borderRadius = "5px";
-buttonDownloadAll.style.fontSize = "18px";
-buttonDownloadAll.style.alignContent = "center";
-buttonDownloadAll.style.color = " #fff";
-buttonDownloadAll.style.position = "fixed";
-buttonDownloadAll.style.right = "0";
-buttonDownloadAll.style.bottom = "350px";
-buttonDownloadAll.style.padding = "0.5rem";
-buttonDownloadAll.style.margin = "0.5rem 0.5rem 0.5rem 0";
-buttonDownloadAll.style.transition = "0.2s all";
-buttonDownloadAll.style.cursor = "pointer";
-buttonDownloadAll.style.transform = "scale(0.98)";
-buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+const styleButtonAll = document.createElement("style");
+styleImage.innerHTML = buttonDownloadAllCss
+buttonDownloadAll.className = "styleButtonAll"
+
 const body = document.getElementsByTagName("body")[0];
-
 body.appendChild(buttonDownloadAll);
-
+body.appendChild(styleImage)
+body.appendChild(styleButtonAll);
 let linkImg = "";
 
 setInterval(() => {
@@ -85,7 +74,7 @@ setInterval(() => {
       checkbox.type = "checkbox";
       checkbox.id = "checkbox";
       body.appendChild(style)
-    
+
 
       const button = document.createElement("button");
       button.innerText = "\u21E9";
@@ -94,7 +83,7 @@ setInterval(() => {
       button.className = "buttonCss"
       body.appendChild(stylebutton)
 
-      checkbox.addEventListener("click", function (e : any) {
+      checkbox.addEventListener("click", function (e: any) {
         e.stopPropagation();
 
         const id = e.path[1].innerHTML.match(idReg)[0];
@@ -124,24 +113,22 @@ setInterval(() => {
 }, 100);
 
 buttonDownloadAll.addEventListener("click", async function (e) {
+
   if (imgIdArr.length > 0) {
     const urlArr = [];
 
     const isAllCheck = false;
     Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
-      (el : any) => (el.checked = isAllCheck)
+      (el: any) => (el.checked = isAllCheck)
     );
     for (let i = 0; i < imgIdArr.length; i++) {
       const data = await API.getArtwordData(imgIdArr[i]);
       urlArr.push(checkURL.classifiedPageCount(data));
     }
- 
-    const response = urlArr.map(nestedurl => {
-        nestedurl.map(element => {
-          return downloadImage(element);
-        });
-          })
-  
+    const flatUrl : any[] = urlArr.flat();
+    const response = flatUrl.map((artworkAfterClassified)=> {   
+      return downloadImage(artworkAfterClassified);
+    })
 
     await Promise.all(response).then(() => {
       imgIdArr = [];
@@ -183,9 +170,9 @@ async function createProcess(responseafterdownload, filename, urlFromAPI) {
   const reader = dataDownload.body.getReader();
   const contentLength = +responseafterdownload.headers.get("Content-Length");
   await readContentLength(contentLength, reader, processBar, myProgress);
-  responseafterdownload.blob().then( async (blob) => {
+  responseafterdownload.blob().then(async (blob) => {
     const url = URL.createObjectURL(blob);
-     sendDownload(url, filename);
+    sendDownload(url, filename);
   });
 
 }
@@ -215,9 +202,9 @@ async function readContentLength(
     processBar.innerHTML == "100%" ||
     processBar.innerHTML == "Infinity%"
   ) {
-      myProgress1.style.display = "none";
-      processBar.style.width = 0 + "%";
-      processBar.innerHTML = 0 + "%";
+    myProgress1.style.display = "none";
+    processBar.style.width = 0 + "%";
+    processBar.innerHTML = 0 + "%";
   }
 }
 
@@ -250,7 +237,7 @@ async function checkImage(url: string) {
       const responseafterdownload = await getUrlAfterDownload(url, nameArtist);
       queue.push(responseafterdownload);
     }
-    
+
     // limit batch download to 10 image
     asyncEachUrl(queue, (artwork) => {
       createProcess(artwork, nameArtist, urlFromAPI)
@@ -294,7 +281,7 @@ async function getUrlAfterDownload(newurl: string, filename: string) {
     credentials: "same-origin",
     headers: myHeaders,
   }).catch(async (e) => {
-    chrome.runtime.sendMessage({ notification: `reload-extension"` });
+    chrome.runtime.sendMessage({ notification: `reloadextension"` });
     const responseafterdownload = await getRetryDownload(
       newurl,
       3000,
@@ -307,9 +294,9 @@ async function getUrlAfterDownload(newurl: string, filename: string) {
   return responseafterdownload;
 }
 
- function sendDownload(urlInput, filename) {
-   chrome.runtime.sendMessage({
-    notification: "download-filename",
+function sendDownload(urlInput, filename) {
+  chrome.runtime.sendMessage({
+    notification: "downloadfilename",
     url: urlInput,
     filename: filename,
   });
@@ -317,7 +304,7 @@ async function getUrlAfterDownload(newurl: string, filename: string) {
 
 getImageUrlOriginal().then(async (res) => {
   if (res.length > 0) {
-    downloadImage(res,'Close');
+    downloadImage(res, 'Close');
   }
 });
 
@@ -327,7 +314,7 @@ chrome.storage.local.get("arrUrl1", async function (res) {
     const response = res.arrUrl1.map((url) => {
       return downloadImage(url);
     });
- 
+
     await new Promise<void>((resolve) => {
       setTimeout(() => {
         chrome.runtime.sendMessage({ notification: "Close" });
@@ -339,3 +326,7 @@ chrome.storage.local.get("arrUrl1", async function (res) {
 });
 
 clearImageUrl();
+function alert(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

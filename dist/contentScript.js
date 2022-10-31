@@ -116,6 +116,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
 /* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
 /* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
+/* harmony export */   "myImagecss": () => (/* binding */ myImagecss),
 /* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
 /* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
 /* harmony export */ });
@@ -150,7 +151,7 @@ class checkURL {
     static classifiedPageCount(data) {
         var _a;
         const urlArr = [];
-        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 || data) {
+        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 && data) {
             urlArr.push(data);
         }
         else {
@@ -174,14 +175,14 @@ class check {
     }
 }
 const buttonDownloadAllCss = `
-.style {
+.styleButtonAll{
   zIndex : 9999;
   background-color: #52e010;
   border-radius : 5px;
   font-size : 18px;
   align-content : center;
-  color : #fff;
   position : fixed;
+  color : #fff;
   right : 0;
   bottom : 350px;
   padding : 0.5rem;
@@ -224,6 +225,15 @@ transform : scale(0.98);
 opacity : 0.5rem;
 box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
+`;
+const myImagecss = `
+.myImage {
+  borderRadius : 5px;
+  border : 1px solid black;
+  padding : 5px;
+  width : 150px;
+}
+
 `;
 const myProgresscss = `
 .myProgress {
@@ -464,36 +474,25 @@ function downloadImage(url, msg = "undifined") {
             .catch((e) => {
             downloadImage(url);
             resolve(e);
-            chrome.runtime.sendMessage({ notification: `reload-extension"` });
+            chrome.runtime.sendMessage({ notification: `reloadextension"` });
         });
     });
 }
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
 let myImage = document.createElement("img");
-myImage.style.borderRadius = "5px";
-myImage.style.border = "1px solid black";
-myImage.style.padding = "5px";
-myImage.style.width = "150px";
+const styleImage = document.createElement("style");
+styleImage.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkboxCss;
+myImage.className = "myImage";
 const buttonDownloadAll = document.createElement("button");
 buttonDownloadAll.innerHTML = "Download all";
-buttonDownloadAll.style.zIndex = "9999";
-buttonDownloadAll.style.backgroundColor = "#52e010";
-buttonDownloadAll.style.borderRadius = "5px";
-buttonDownloadAll.style.fontSize = "18px";
-buttonDownloadAll.style.alignContent = "center";
-buttonDownloadAll.style.color = " #fff";
-buttonDownloadAll.style.position = "fixed";
-buttonDownloadAll.style.right = "0";
-buttonDownloadAll.style.bottom = "350px";
-buttonDownloadAll.style.padding = "0.5rem";
-buttonDownloadAll.style.margin = "0.5rem 0.5rem 0.5rem 0";
-buttonDownloadAll.style.transition = "0.2s all";
-buttonDownloadAll.style.cursor = "pointer";
-buttonDownloadAll.style.transform = "scale(0.98)";
-buttonDownloadAll.style.boxShadow = "3px 2px 22px 1px rgba(0, 0, 0, 0.24)";
+const styleButtonAll = document.createElement("style");
+styleImage.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.buttonDownloadAllCss;
+buttonDownloadAll.className = "styleButtonAll";
 const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
+body.appendChild(styleImage);
+body.appendChild(styleButtonAll);
 let linkImg = "";
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
@@ -550,10 +549,9 @@ buttonDownloadAll.addEventListener("click", function (e) {
                 const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(imgIdArr[i]);
                 urlArr.push(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.classifiedPageCount(data));
             }
-            const response = urlArr.map(nestedurl => {
-                nestedurl.map(element => {
-                    return downloadImage(element);
-                });
+            const flatUrl = urlArr.flat();
+            const response = flatUrl.map((element) => {
+                return downloadImage(element);
             });
             yield Promise.all(response).then(() => {
                 imgIdArr = [];
@@ -685,7 +683,7 @@ function getUrlAfterDownload(newurl, filename) {
             credentials: "same-origin",
             headers: _utils_api__WEBPACK_IMPORTED_MODULE_0__.myHeaders,
         }).catch((e) => __awaiter(this, void 0, void 0, function* () {
-            chrome.runtime.sendMessage({ notification: `reload-extension"` });
+            chrome.runtime.sendMessage({ notification: `reloadextension"` });
             const responseafterdownload = yield getRetryDownload(newurl, 3000, 5, fetchOptions);
             return responseafterdownload;
         }));
@@ -694,7 +692,7 @@ function getUrlAfterDownload(newurl, filename) {
 }
 function sendDownload(urlInput, filename) {
     chrome.runtime.sendMessage({
-        notification: "download-filename",
+        notification: "downloadfilename",
         url: urlInput,
         filename: filename,
     });
@@ -721,6 +719,9 @@ chrome.storage.local.get("arrUrl1", function (res) {
     });
 });
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.clearImageUrl)();
+function alert(arg0) {
+    throw new Error("Function not implemented.");
+}
 
 })();
 

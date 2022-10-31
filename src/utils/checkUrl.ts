@@ -16,7 +16,7 @@ export class checkURL {
   }
   static classifiedPageCount(data: ArtworkData): any[] {
     const urlArr = [];
-    if (data?.body?.pageCount <= 1 || data) {
+    if (data?.body?.pageCount <= 1 && data) {
       urlArr.push(data);
     } else {
       for (let i = 0; i < data.body.pageCount; i++) {
@@ -40,14 +40,14 @@ export class check {
 }
 
 export const buttonDownloadAllCss = `
-.style {
+.styleButtonAll{
   zIndex : 9999;
   background-color: #52e010;
   border-radius : 5px;
   font-size : 18px;
   align-content : center;
-  color : #fff;
   position : fixed;
+  color : #fff;
   right : 0;
   bottom : 350px;
   padding : 0.5rem;
@@ -93,7 +93,15 @@ opacity : 0.5rem;
 box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
 `
+export const myImagecss =`
+.myImage {
+  borderRadius : 5px;
+  border : 1px solid black;
+  padding : 5px;
+  width : 150px;
+}
 
+`
 
 export const myProgresscss = `
 .myProgress {

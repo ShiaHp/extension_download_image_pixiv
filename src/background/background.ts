@@ -113,27 +113,40 @@ chrome.contextMenus.onClicked.addListener((event) => {
 });
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
-  if (request.notification === "Close")
-    chrome.tabs.query({}, (tabs) => {
-      for (let i = 1; i <= data; i++) {
-        chrome.tabs.remove(tabs[tabs.length - i].id);
-      }
-    });
-
-
-  if (request.notification === "reload-extension") {
-    chrome.runtime.requestUpdateCheck(() => {
-      chrome.runtime.reload();
-    });
+  
+  function closeTab() {
+    return chrome.tabs.query({}, (tabs) => {
+        for (let i = 1; i <= data; i++) {
+          chrome.tabs.remove(tabs[tabs.length - i].id);
+        }
+      })
+    }
+  function reloadextension() {
+    return chrome.runtime.requestUpdateCheck(() => {
+        chrome.runtime.reload();
+      });
+    }
+  function downloadFileName() {
+    return chrome.downloads.download({
+       url: request.url,
+       filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
+       conflictAction: 'overwrite',
+       saveAs: false,
+     })
+   }
+  const getFunctionStrategies = {
+    Close: closeTab,
+    reloadextension: reloadextension,
+    downloadfilename: downloadFileName
+  }
+ function getFunction(typeFunction) {
+     return getFunctionStrategies[typeFunction]
+  }
+  if(request.notification ){
+    console.log(request.notification)
+    getFunction(request.notification).call()
   }
 
-  if (request.notification === "download-filename") {
-    chrome.downloads.download({
-      url: request.url,
-      filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
-      conflictAction: 'overwrite',
-      saveAs: false,
-    })
+ 
 
-  }
 });

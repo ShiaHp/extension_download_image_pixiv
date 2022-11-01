@@ -149,10 +149,10 @@ class checkURL {
         });
     }
     static classifiedPageCount(data) {
-        var _a;
+        var _a, _b, _c;
         const urlArr = [];
         if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 && data) {
-            urlArr.push(data);
+            urlArr.push((_c = (_b = data === null || data === void 0 ? void 0 : data.body) === null || _b === void 0 ? void 0 : _b.urls) === null || _c === void 0 ? void 0 : _c.original);
         }
         else {
             for (let i = 0; i < data.body.pageCount; i++) {
@@ -478,6 +478,7 @@ function downloadImage(url, msg = "undifined") {
         });
     });
 }
+const body = document.getElementsByTagName("body")[0];
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
 let myImage = document.createElement("img");
@@ -489,7 +490,6 @@ buttonDownloadAll.innerHTML = "Download all";
 const styleButtonAll = document.createElement("style");
 styleImage.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.buttonDownloadAllCss;
 buttonDownloadAll.className = "styleButtonAll";
-const body = document.getElementsByTagName("body")[0];
 body.appendChild(buttonDownloadAll);
 body.appendChild(styleImage);
 body.appendChild(styleButtonAll);
@@ -550,21 +550,19 @@ buttonDownloadAll.addEventListener("click", function (e) {
                 urlArr.push(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.classifiedPageCount(data));
             }
             const flatUrl = urlArr.flat();
-            const response = flatUrl.map((element) => {
-                return downloadImage(element);
+            const response = flatUrl.map((artworkAfterClassified) => {
+                return downloadImage(artworkAfterClassified);
             });
             yield Promise.all(response).then(() => {
                 imgIdArr = [];
             });
         }
         else {
-            alert("Please select artworks");
+            alert("Please select an artwork");
         }
     });
 });
-let countQueue = 0;
 let queue = [];
-let queueCountEveryArtworkHadBeenChoosed = [];
 const myProgress = document.createElement("div");
 myProgress.setAttribute("id", "myProgress");
 const processBar = document.createElement("div");
@@ -588,7 +586,6 @@ function createProcess(responseafterdownload, filename, urlFromAPI) {
         myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
         myProgress.style.display = "block";
         processBar.style.display = "block";
-        myProgress.style.bottom = `${countQueue * 10} px`;
         body.appendChild(myProgress);
         let dataDownload = yield responseafterdownload.clone();
         const reader = dataDownload.body.getReader();
@@ -638,7 +635,6 @@ function checkImage(url) {
         const nameArtist = data.body.userName;
         const count = data.body.pageCount;
         const urlFromAPI = data.body.urls.original;
-        queueCountEveryArtworkHadBeenChoosed.push(urlFromAPI);
         if (data.body.pageCount <= 1) {
             const responseafterdownload = yield getUrlAfterDownload(urlFromAPI, nameArtist);
             createProcess(responseafterdownload, nameArtist, urlFromAPI);
@@ -719,9 +715,6 @@ chrome.storage.local.get("arrUrl1", function (res) {
     });
 });
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.clearImageUrl)();
-function alert(arg0) {
-    throw new Error("Function not implemented.");
-}
 
 })();
 

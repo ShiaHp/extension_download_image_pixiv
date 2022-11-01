@@ -149,10 +149,10 @@ class checkURL {
         });
     }
     static classifiedPageCount(data) {
-        var _a;
+        var _a, _b, _c;
         const urlArr = [];
         if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 && data) {
-            urlArr.push(data);
+            urlArr.push((_c = (_b = data === null || data === void 0 ? void 0 : data.body) === null || _b === void 0 ? void 0 : _b.urls) === null || _c === void 0 ? void 0 : _c.original);
         }
         else {
             for (let i = 0; i < data.body.pageCount; i++) {

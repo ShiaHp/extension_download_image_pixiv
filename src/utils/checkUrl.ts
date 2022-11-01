@@ -1,3 +1,4 @@
+
 import { API, ArtworkData } from "./api";
 
 export const idReg = /[0-9]{7,11}/;
@@ -17,7 +18,7 @@ export class checkURL {
   static classifiedPageCount(data: ArtworkData): any[] {
     const urlArr = [];
     if (data?.body?.pageCount <= 1 && data) {
-      urlArr.push(data);
+      urlArr.push(data?.body?.urls?.original);
     } else {
       for (let i = 0; i < data.body.pageCount; i++) {
         const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);

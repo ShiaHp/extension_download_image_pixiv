@@ -5,7 +5,11 @@ import {
   clearImageUrl,
   getImageUrlOriginal,
 } from "../utils/storage";
-import { checkURL, idReg, checkboxCss, buttonCss, myImagecss, buttonDownloadAllCss } from "../utils/checkUrl";
+import { checkURL, idReg, checkboxCss, 
+  buttonCss, myImagecss, buttonDownloadAllCss ,
+  
+
+} from "../utils/checkUrl";
 
 function downloadImage(url: string, msg = "undifined") {
   return new Promise((resolve, reject) => {
@@ -39,6 +43,7 @@ function downloadImage(url: string, msg = "undifined") {
       });
   });
 }
+const body = document.getElementsByTagName("body")[0];
 
 let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
@@ -53,7 +58,7 @@ const styleButtonAll = document.createElement("style");
 styleImage.innerHTML = buttonDownloadAllCss
 buttonDownloadAll.className = "styleButtonAll"
 
-const body = document.getElementsByTagName("body")[0];
+
 body.appendChild(buttonDownloadAll);
 body.appendChild(styleImage)
 body.appendChild(styleButtonAll);
@@ -125,21 +130,21 @@ buttonDownloadAll.addEventListener("click", async function (e) {
       const data = await API.getArtwordData(imgIdArr[i]);
       urlArr.push(checkURL.classifiedPageCount(data));
     }
-    const flatUrl : any[] = urlArr.flat();
-    const response = flatUrl.map((artworkAfterClassified)=> {   
+    const flatUrl: any[] = urlArr.flat();
+    const response = flatUrl.map((artworkAfterClassified) => {
       return downloadImage(artworkAfterClassified);
     })
 
     await Promise.all(response).then(() => {
       imgIdArr = [];
-    });
+    })
   } else {
-    alert("Please select artworks");
+    alert("Please select an artwork");
   }
 });
-let countQueue = 0;
+
 let queue = [];
-let queueCountEveryArtworkHadBeenChoosed = [];
+
 const myProgress = document.createElement("div");
 myProgress.setAttribute("id", "myProgress");
 const processBar = document.createElement("div");
@@ -164,7 +169,6 @@ async function createProcess(responseafterdownload, filename, urlFromAPI) {
   myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
   myProgress.style.display = "block";
   processBar.style.display = "block";
-  myProgress.style.bottom = `${countQueue * 10} px`;
   body.appendChild(myProgress);
   let dataDownload = await responseafterdownload.clone();
   const reader = dataDownload.body.getReader();
@@ -223,7 +227,6 @@ async function checkImage(url: string) {
   const nameArtist = data.body.userName;
   const count = data.body.pageCount;
   const urlFromAPI = data.body.urls.original;
-  queueCountEveryArtworkHadBeenChoosed.push(urlFromAPI);
   if (data.body.pageCount <= 1) {
     const responseafterdownload = await getUrlAfterDownload(
       urlFromAPI,
@@ -326,7 +329,3 @@ chrome.storage.local.get("arrUrl1", async function (res) {
 });
 
 clearImageUrl();
-function alert(arg0: string) {
-  throw new Error("Function not implemented.");
-}
-

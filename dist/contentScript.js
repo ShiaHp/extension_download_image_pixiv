@@ -704,11 +704,14 @@ chrome.storage.local.get("arrUrl1", function (res) {
             const response = res.arrUrl1.map((url) => {
                 return downloadImage(url);
             });
+            let timeWaitToResolve = 2000;
             yield new Promise((resolve) => {
                 setTimeout(() => {
-                    chrome.runtime.sendMessage({ notification: "Close" });
+                    if (res.isClose == 1) {
+                        chrome.runtime.sendMessage({ notification: "Close" });
+                    }
                     resolve();
-                }, 2000);
+                }, timeWaitToResolve);
             });
             yield Promise.all(response);
         }

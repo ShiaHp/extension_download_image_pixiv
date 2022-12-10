@@ -164,7 +164,7 @@ const App = () => {
                                 .catch(function (err) {
                                 console.log(err.message);
                             });
-                            chrome.storage.local.set({ arrUrl1: imgList }, () => {
+                            chrome.storage.local.set({ arrUrl1: imgList, isClose: 0 }, () => {
                                 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                                     chrome.tabs.reload(tabs[0].id);
                                 });

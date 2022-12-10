@@ -501,7 +501,7 @@ const functionDownloadImage = (id, type) => __awaiter(void 0, void 0, void 0, fu
             const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
             imgList.push(url);
         }
-        chrome.storage.local.set({ arrUrl1: imgList }, () => {
+        chrome.storage.local.set({ arrUrl1: imgList, isClose: 1 }, () => {
             chrome.tabs.query({}, () => __awaiter(void 0, void 0, void 0, function* () {
                 chrome.tabs.create({
                     active: false,
@@ -559,7 +559,6 @@ chrome.runtime.onMessage.addListener(function (request) {
         return getFunctionStrategies[typeFunction];
     }
     if (request.notification) {
-        console.log(request.notification);
         getFunction(request.notification).call();
     }
 });

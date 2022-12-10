@@ -35,6 +35,8 @@ _Đây là một pet project để học hỏi, cải thiện và vọc vạch n
   
   ![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/88889182/188258474-582f23db-8537-41ec-9564-5f29c079133f.gif)
 
+## Bug:
+- Không hiểu tự dưng lòi ra cái bug hiện dialog lúc batch download nhưng có vẻ lỗi bên api của Chrome nên giờ chủ tus cũng bó tay @@
 ## Để chạy dự án :
  - Bạn cần cài đặt môi trường node. Khuyến khích sử dụng node version 16 vì hiện tại đang có lỗi với v18
  - Sau khi git clone về thì bạn hãy chạy dòng lệnh :  `npm i` 

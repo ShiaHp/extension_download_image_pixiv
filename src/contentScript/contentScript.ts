@@ -317,12 +317,15 @@ chrome.storage.local.get("arrUrl1", async function (res) {
     const response = res.arrUrl1.map((url) => {
       return downloadImage(url);
     });
-
+    let timeWaitToResolve = 2000
+   
     await new Promise<void>((resolve) => {
       setTimeout(() => {
-        chrome.runtime.sendMessage({ notification: "Close" });
+        if(res.isClose == 1){
+          chrome.runtime.sendMessage({ notification: "Close" })
+        } 
         resolve();
-      }, 2000);
+      },timeWaitToResolve);
     });
     await Promise.all(response);
   }

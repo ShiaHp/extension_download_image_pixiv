@@ -1,8 +1,8 @@
 {
-  "name": "Pixiv-Downloader",
-  "description": "Pixiv-Downloader",
+  "name": "Extension_Pixiv",
+  "description": "Extension_Pixiv",
   "version": "1.0.2",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
@@ -10,7 +10,7 @@
   },
   "browser_action": {
     "default_popup": "popup.html",
-    "default_title": "Pixiv-Downloader",
+    "default_title": "Extension_Pixiv",
     "default_icon": "icon.png"
   },
   "permissions": [
@@ -30,7 +30,8 @@
     "*://*.pixiv.cat/*",
     "webRequest",
     "webRequestBlocking",
-    "management" 
+    "management" ,
+    "declarativeNetRequestWithHostAccess"
   ],
   "options_page": "options.html",
   "background": {
@@ -44,5 +45,20 @@
         "contentScript.js"
       ]
     }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "declarative_net_request_rules.json"
+      }
+    ]
+  },
+  "host_permissions": [
+    "*://www.pixiv.net/*",
+    "*://www.pixivision.net/*",
+    "*://*.pximg.net/*",
+    "*://*.pixiv.cat/*"
   ]
 }

@@ -1,35 +1,12 @@
-import { idReg, idTweet, check, format_twitter, format_pixiv } from "./../utils/checkUrl";
-// TODO: background script
+import { Artwork } from './../interface/artwork';
+import { idPixiv, idTweet, Utils, format_twitter, format_pixiv } from "../utils/classified";
 import {
   setImageUrlOriginalStorage,
 } from "../utils/storage";
-import { API, ArtworkData } from "../utils/api";
-const regex = /access-control-allow-origin/i;
+import { API } from "../utils/api";
+import { responseListener } from './header'
 
-function removeMatchingHeaders(
-  headers: chrome.webRequest.HttpHeader[],
-  regex: RegExp
-) {
-  for (let i = 0, header; (header = headers[i]); i++) {
-    if (header.name.match(regex)) {
-      headers.splice(i, 1);
-      return;
-    }
-  }
-}
-
-function responseListener(
-  details: chrome.webRequest.WebResponseHeadersDetails
-) {
-  removeMatchingHeaders(details.responseHeaders!, regex);
-  details.responseHeaders!.push({
-    name: "access-control-allow-origin",
-    value: "*",
-  });
-
-  return { responseHeaders: details.responseHeaders };
-}
-
+// REQUEST REGION
 chrome.webRequest.onHeadersReceived.addListener(
   responseListener,
   {
@@ -40,8 +17,8 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 const callAPI = async (id: string, type: number): Promise<object> => {
   const apiName = {
-    0: API.getArtwordData(id),
-    1: API.getArtwordDataTwitter(id),
+    0: API.getArtwork(id),
+    1: API.getArtworkTwitter(id),
   }
   let infoArtwork: object = {};
   await apiName[type].then((data : object) => {
@@ -58,9 +35,9 @@ const createNewTab = (infoArtwork, type : number) => {
   });
   setImageUrlOriginalStorage(in4toOpen);
 }
-const functionDownloadImage = async (id: string, type: number) => {
 
-  const infoArtwork: ArtworkData = await callAPI(id, type)
+const functionDownloadImage = async (id: string, type: number) => {
+  const infoArtwork: Artwork = await callAPI(id, type)
 
   const artworkName = {
     0: infoArtwork?.body?.pageCount,
@@ -88,8 +65,6 @@ const functionDownloadImage = async (id: string, type: number) => {
   }
 }
 
-
-
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     contexts: ["selection", "link"],
@@ -102,14 +77,14 @@ chrome.contextMenus.onClicked.addListener((event) => {
   if (event.selectionText) {
     functionDownloadImage(event.selectionText, format_pixiv );
   } else {
-    const typeToCheck: number = check.checkName(event.linkUrl)
-    const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idReg)[0] : event.linkUrl.match(idTweet)[0]
+    const typeToCheck: number = Utils.isPixiv(event.linkUrl)
+    const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idPixiv)[0] : event.linkUrl.match(idTweet)[0]
     functionDownloadImage(exactName, typeToCheck);
   }
 });
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
-  
+
   function closeTab() {
     return chrome.tabs.query({}, (tabs) => {
         for (let i = 1; i <= data; i++) {
@@ -142,6 +117,6 @@ chrome.runtime.onMessage.addListener(function (request) {
     getFunction(request.notification).call()
   }
 
- 
+
 
 });

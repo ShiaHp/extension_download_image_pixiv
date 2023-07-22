@@ -1,8 +1,3 @@
-/******/ (() => { // webpackBootstrap
-var __webpack_exports__ = {};
-/*!********************************!*\
-  !*** ./src/ts/popup/popup.tsx ***!
-  \********************************/
 // import React, { useState, useEffect } from "react";
 // import ReactDOM from "react-dom";
 // import { InputBase, Box, Grid, Typography, Button } from "@material-ui/core";
@@ -10,6 +5,7 @@ var __webpack_exports__ = {};
 // import { getStoredSingle, setIDArtistStorage } from "../utils/storage";
 // import { API, Artwork } from "../utils/api";
 // import "./popup.css";
+
 // const App: React.FC<{}> = () => {
 //   const [idSingle, setIdSingle] = useState<string | "">("");
 //   const [idInput, setIdInput] = useState<string | "">("");
@@ -18,6 +14,7 @@ var __webpack_exports__ = {};
 //   const [offset, setOffset] = useState<number | 48>();
 //   const [limit, setLimit] = useState<number | 48>();
 //   const [illusts, setIllusts] = useState<string[] | []>([]);
+
 //   useEffect(() => {
 //     getStoredSingle().then((idSingle) => {
 //       setIdSingle(idSingle);
@@ -34,6 +31,7 @@ var __webpack_exports__ = {};
 //             const response = result.userKeyIds[0].keyPairId.map((item) => {
 //               return API.getArtwork(item);
 //             });
+
 //             await Promise.all(response)
 //               .then((files) => {
 //                 files.forEach((file : Artwork) => {
@@ -53,6 +51,7 @@ var __webpack_exports__ = {};
 //               .catch(function (err) {
 //                 console.log(err.message);
 //               });
+
 //             chrome.storage.local.set({ arrUrl1: imgList, isClose : 0 }, () => {
 //               chrome.tabs.query(
 //                 { active: true, currentWindow: true },
@@ -71,6 +70,7 @@ var __webpack_exports__ = {};
 //     await API.getAllArtworks(updateIdArtist).then((data) => {
 //       setIllusts(data.body.illusts);
 //     });
+
 //     const arrUrl = Object.keys(illusts);
 //     setValueAndDownload(arrUrl);
 //   };
@@ -86,6 +86,7 @@ var __webpack_exports__ = {};
 //       });
 //     });
 //   }
+
 //   const handleUserClickButton = async () => {
 //     const arrUrl = [];
 //     await API.getBookMarkOfUser(idArtist, "illusts", offset * 48, limit).then(
@@ -99,6 +100,7 @@ var __webpack_exports__ = {};
 //       }
 //     );
 //   };
+
 //   chrome.runtime.sendMessage({ notification: "download" }, () => {
 //     chrome.runtime.onMessage.addListener(function (request) {
 //       if (request.notification === "close-window") {
@@ -106,6 +108,7 @@ var __webpack_exports__ = {};
 //       }
 //     });
 //   });
+
 //   const cssButton = {
 //     backgroundColor: "#10a1ef",
 //     border: "none",
@@ -118,12 +121,14 @@ var __webpack_exports__ = {};
 //     margin: "4px 2px",
 //     cursor: "pointer",
 //   };
+
 //   const styleFont = {
 //     border: "1px solid black",
 //     color: "black",
 //     padding: "10px",
 //     fontFamily: "Sans-Serif",
 //   };
+
 //   return (
 //     <Box mx="9px" my="16px">
 //       <Grid container spacing={2}>
@@ -189,10 +194,7 @@ var __webpack_exports__ = {};
 //     </Box>
 //   );
 // };
+
 // const root = document.createElement("div");
 // document.body.appendChild(root);
 // ReactDOM.render(<App />, root);
-
-/******/ })()
-;
-//# sourceMappingURL=popup.js.map

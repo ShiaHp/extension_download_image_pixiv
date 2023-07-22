@@ -5,10 +5,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
-    popup: path.resolve('src/popup/popup.tsx'),
-    options: path.resolve('src/options/options.tsx'),
-    background: path.resolve('src/background/background.ts'),
-    contentScript: path.resolve('src/contentScript/contentScript.ts'),
+    popup: path.resolve('./src/ts/popup/popup.tsx'),
+    options: path.resolve('./src/ts/options/options.tsx'),
+    background: path.resolve('./src/ts/background/background.ts'),
+    contentScript: path.resolve('./src/ts/contentScript/contentScript.ts'),
   },
   module: {
     rules: [
@@ -60,7 +60,7 @@ module.exports = {
 
 function getHtmlPlugins(chunks) {
   return chunks.map(chunk => new HtmlPlugin({
-    title: 'Weather Extension',
+    title: '',
     filename: `${chunk}.html`,
     chunks: [chunk],
   }))

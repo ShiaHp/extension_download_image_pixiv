@@ -40,11 +40,6 @@ export function setImageUrlStorage(imgUrl: string): Promise<void> {
   });
 }
 
-
-
-
-
-
 export function setImageUrlOriginalStorage(imgUrlOriginal: string): Promise<void> {
   const vals: LocalStorage = {
     imgUrlOriginal,
@@ -55,6 +50,7 @@ export function setImageUrlOriginalStorage(imgUrlOriginal: string): Promise<void
     });
   });
 }
+
 export function getImageUrlOriginal(): Promise<string> {
   const keys: LocalStorageKeys = "imgUrlOriginal";
   return new Promise((resolve, reject) => {
@@ -63,6 +59,7 @@ export function getImageUrlOriginal(): Promise<string> {
     });
   });
 }
+
 export function getImageUrl(): Promise<string> {
   const keys: LocalStorageKeys = "imgUrl";
   return new Promise((resolve, reject) => {
@@ -72,10 +69,8 @@ export function getImageUrl(): Promise<string> {
   });
 }
 
-export function clearImageUrl(): void {
-
+export function clearImage(): void {
   chrome.storage.local.clear()
-
 }
 
 export function setIDArtistStorage(idArtist: string): Promise<void> {

@@ -2,10 +2,114 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/utils/api.ts":
-/*!**************************!*\
-  !*** ./src/utils/api.ts ***!
-  \**************************/
+/***/ "./src/style/button.ts":
+/*!*****************************!*\
+  !*** ./src/style/button.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
+/* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
+/* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
+/* harmony export */   "myImagecss": () => (/* binding */ myImagecss),
+/* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
+/* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
+/* harmony export */ });
+const buttonDownloadAllCss = `
+.styleButtonAll{
+  zIndex: 9999;
+  background-color: #52e010;
+  border-radius: 5px;
+  font-size: 18px;
+  align-content: center;
+  position: fixed;
+  color: #fff;
+  right: 0;
+  bottom: 350px;
+  padding: 0.5rem;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  transition: 0.2s all;
+  cursor: pointer;
+  transform: scale(0.98);
+  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+  }
+`;
+const checkboxCss = `
+.stylecheckbox {
+  z-index: 9998;
+  font-size: 20px;
+  position: absolute;
+  border-radius: 5px;
+  top: 0px;
+  left: 0px;
+  height: 25px;
+  width: 25px;
+  background-color: rgba(255, 255, 255, 0.5rem);
+}
+`;
+const buttonCss = `
+.buttonCss {
+  z-index: 9999;
+  background-color: #52e010;
+  border-radius: 5px;
+  font-size: 18px;
+  align-content: center;
+  color: #fff;
+  position : absolute;
+  right: 0;
+  top: 1rem;
+  padding: 0.5rem;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  transition: 0.2s all;
+  cursor: pointer;
+  transform: scale(0.98);
+  opacity: 0.5rem;
+  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+`;
+const myImagecss = `
+.myImage {
+  borderRadius: 5px;
+  border: 1px solid black;
+  padding: 5px;
+  width: 150px;
+}
+
+`;
+const myProgresscss = `
+  .myProgress {
+    width: 100px;
+    height: 10px;
+    backgroundColor: #ddd;
+    display: none;
+    zIndex: 1000;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    padding: 0.5rem;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    display: block;
+}
+`;
+const processBarcss = `
+  .processBar {
+    background-color: #04AA6D;
+    font-size: 15px;
+    width: 10%;
+    height: 10px;
+    display: block;
+  }
+`;
+
+
+/***/ }),
+
+/***/ "./src/ts/utils/api.ts":
+/*!*****************************!*\
+  !*** ./src/ts/utils/api.ts ***!
+  \*****************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -61,13 +165,13 @@ class API {
             return this.sendGetRequest(url);
         });
     }
-    static getArtwordDataTwitter(id) {
+    static getArtworkTwitter(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const url = ` https://gettweet.onrender.com/tweet/${id}`;
+            const url = `https://gettweet.onrender.com/tweet/${id}`;
             return this.sendGetRequest(url);
         });
     }
-    static getArtwordData(id) {
+    static getArtwork(id) {
         const url = `https://www.pixiv.net/ajax/illust/${id}`;
         return this.sendGetRequest(url);
     }
@@ -99,28 +203,21 @@ class API {
 
 /***/ }),
 
-/***/ "./src/utils/checkUrl.ts":
-/*!*******************************!*\
-  !*** ./src/utils/checkUrl.ts ***!
-  \*******************************/
+/***/ "./src/ts/utils/classified.ts":
+/*!************************************!*\
+  !*** ./src/ts/utils/classified.ts ***!
+  \************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "idReg": () => (/* binding */ idReg),
+/* harmony export */   "idPixiv": () => (/* binding */ idPixiv),
 /* harmony export */   "idTweet": () => (/* binding */ idTweet),
 /* harmony export */   "format_pixiv": () => (/* binding */ format_pixiv),
 /* harmony export */   "format_twitter": () => (/* binding */ format_twitter),
-/* harmony export */   "checkURL": () => (/* binding */ checkURL),
-/* harmony export */   "check": () => (/* binding */ check),
-/* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
-/* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
-/* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
-/* harmony export */   "myImagecss": () => (/* binding */ myImagecss),
-/* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
-/* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
+/* harmony export */   "Utils": () => (/* binding */ Utils)
 /* harmony export */ });
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/utils/api.ts");
+/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/ts/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -131,145 +228,52 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idReg = /[0-9]{7,11}/;
+const idPixiv = /\/artworks\/(\d+)/;
 const idTweet = /[0-9]{19,21}/;
 const format_pixiv = 0;
 const format_twitter = 1;
-class checkURL {
-    static getDatafromRequest(url) {
+class Utils {
+    static isPixiv(name) {
+        let isPixiv = name.indexOf("pixiv") > -1;
+        return isPixiv ? 0 : 1;
+    }
+    static getDataUrl(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = url.match(idReg)[0];
-            const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(id);
+            const id = url.match(idPixiv)[0];
+            const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwork(id);
             return data;
         });
     }
     static checkData(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.getDatafromRequest(url).then((data) => data);
+            return this.getDataUrl(url).then((data) => data);
         });
     }
-    static classifiedPageCount(data) {
-        var _a, _b, _c;
+    static classifiedPageCount(arkwork) {
+        var _a, _b;
         const urlArr = [];
-        if (((_a = data === null || data === void 0 ? void 0 : data.body) === null || _a === void 0 ? void 0 : _a.pageCount) <= 1 && data) {
-            urlArr.push((_c = (_b = data === null || data === void 0 ? void 0 : data.body) === null || _b === void 0 ? void 0 : _b.urls) === null || _c === void 0 ? void 0 : _c.original);
+        const pageCount = (_a = arkwork === null || arkwork === void 0 ? void 0 : arkwork.body) === null || _a === void 0 ? void 0 : _a.pageCount;
+        const img = (_b = arkwork === null || arkwork === void 0 ? void 0 : arkwork.body) === null || _b === void 0 ? void 0 : _b.urls.original;
+        if (pageCount <= 1 && arkwork) {
+            urlArr.push(img);
         }
         else {
-            for (let i = 0; i < data.body.pageCount; i++) {
-                const url = `${data.body.urls.original}`.replace("_p0", `_p${i}`);
+            for (let i = 0; i < pageCount; i++) {
+                const url = `${img}`.replace("_p0", `_p${i}`);
                 urlArr.push(url);
             }
         }
         return urlArr;
     }
 }
-class check {
-    static checkName(name) {
-        let isPixiv = name.indexOf("pixiv") > -1;
-        if (isPixiv) {
-            return 0;
-        }
-        else {
-            return 1;
-        }
-    }
-}
-const buttonDownloadAllCss = `
-.styleButtonAll{
-  zIndex : 9999;
-  background-color: #52e010;
-  border-radius : 5px;
-  font-size : 18px;
-  align-content : center;
-  position : fixed;
-  color : #fff;
-  right : 0;
-  bottom : 350px;
-  padding : 0.5rem;
-  margin : 0.5rem 0.5rem 0.5rem 0;
-  transition : 0.2s all;
-  cursor : pointer;
-  transform : scale(0.98);
-  box-shadow : 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
-  }
-`;
-const checkboxCss = `
-.stylecheckbox {
-  z-index : 9998;
-  font-size : 20px;
-  position : absolute;
-  border-radius : 5px;
-  top : 0px;
-  left : 0px;
-  height : 25px;
-  width : 25px;
-  background-color : rgba(255, 255, 255, 0.5rem);
-}
-`;
-const buttonCss = `
-.buttonCss {
-z-index : 9999;
-background-color: #52e010;
-border-radius : 5px;
-font-size : 18px;
-align-content: center;
-color :  #fff;
-position : absolute;
-right : 0;
-top : 1rem;
-padding : 0.5rem;
-margin : 0.5rem 0.5rem 0.5rem 0;
-transition : 0.2s all;
-cursor : pointer;
-transform : scale(0.98);
-opacity : 0.5rem;
-box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
-}
-`;
-const myImagecss = `
-.myImage {
-  borderRadius : 5px;
-  border : 1px solid black;
-  padding : 5px;
-  width : 150px;
-}
-
-`;
-const myProgresscss = `
-.myProgress {
- width : 100px;
- height : 10px;
- backgroundColor : #ddd;
- display : none;
- 
- zIndex : 1000;
-
- position : fixed;
- right : 0;
- bottom : 0;
- padding : 0.5rem;
- margin : 0.5rem 0.5rem 0.5rem 0;
- display : block;
-  
-}
-`;
-const processBarcss = `
-  .processBar {
-   background-color : #04AA6D;
-  font-size :15px;
-  width : 10%;
-  height : 10px;
-  display : block;
-  }
-`;
 
 
 /***/ }),
 
-/***/ "./src/utils/storage.ts":
-/*!******************************!*\
-  !*** ./src/utils/storage.ts ***!
-  \******************************/
+/***/ "./src/ts/utils/storage.ts":
+/*!*********************************!*\
+  !*** ./src/ts/utils/storage.ts ***!
+  \*********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -280,7 +284,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "setImageUrlOriginalStorage": () => (/* binding */ setImageUrlOriginalStorage),
 /* harmony export */   "getImageUrlOriginal": () => (/* binding */ getImageUrlOriginal),
 /* harmony export */   "getImageUrl": () => (/* binding */ getImageUrl),
-/* harmony export */   "clearImageUrl": () => (/* binding */ clearImageUrl),
+/* harmony export */   "clearImage": () => (/* binding */ clearImage),
 /* harmony export */   "setIDArtistStorage": () => (/* binding */ setIDArtistStorage),
 /* harmony export */   "getIDArtistStorage": () => (/* binding */ getIDArtistStorage)
 /* harmony export */ });
@@ -341,7 +345,7 @@ function getImageUrl() {
         });
     });
 }
-function clearImageUrl() {
+function clearImage() {
     chrome.storage.local.clear();
 }
 function setIDArtistStorage(idArtist) {
@@ -426,13 +430,14 @@ function getIDArtistStorage() {
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-/*!********************************************!*\
-  !*** ./src/contentScript/contentScript.ts ***!
-  \********************************************/
+/*!***********************************************!*\
+  !*** ./src/ts/contentScript/contentScript.ts ***!
+  \***********************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/api */ "./src/utils/api.ts");
-/* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/storage */ "./src/utils/storage.ts");
-/* harmony import */ var _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/checkUrl */ "./src/utils/checkUrl.ts");
+/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/api */ "./src/ts/utils/api.ts");
+/* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/storage */ "./src/ts/utils/storage.ts");
+/* harmony import */ var _utils_classified__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/classified */ "./src/ts/utils/classified.ts");
+/* harmony import */ var _style_button__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../style/button */ "./src/style/button.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -442,6 +447,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -483,12 +489,12 @@ let imgIdArr = [];
 const imagesArray = document.getElementsByTagName("img");
 let myImage = document.createElement("img");
 const styleImage = document.createElement("style");
-styleImage.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkboxCss;
+styleImage.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.checkboxCss;
 myImage.className = "myImage";
 const buttonDownloadAll = document.createElement("button");
 buttonDownloadAll.innerHTML = "Download all";
 const styleButtonAll = document.createElement("style");
-styleImage.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.buttonDownloadAllCss;
+styleImage.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.buttonDownloadAllCss;
 buttonDownloadAll.className = "styleButtonAll";
 body.appendChild(buttonDownloadAll);
 body.appendChild(styleImage);
@@ -502,7 +508,7 @@ setInterval(() => {
             imagesArray[i].parentElement.childNodes.length <= 1) {
             const checkbox = document.createElement("input");
             const style = document.createElement("style");
-            style.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkboxCss;
+            style.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.checkboxCss;
             checkbox.className = "stylecheckbox";
             checkbox.type = "checkbox";
             checkbox.id = "checkbox";
@@ -510,12 +516,12 @@ setInterval(() => {
             const button = document.createElement("button");
             button.innerText = "\u21E9";
             const stylebutton = document.createElement("style");
-            stylebutton.innerHTML = _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.buttonCss;
+            stylebutton.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.buttonCss;
             button.className = "buttonCss";
             body.appendChild(stylebutton);
             checkbox.addEventListener("click", function (e) {
                 e.stopPropagation();
-                const id = e.path[1].innerHTML.match(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.idReg)[0];
+                const id = e.path[1].innerHTML.match(_utils_classified__WEBPACK_IMPORTED_MODULE_2__.idPixiv)[0];
                 // check if the id is already in array
                 if (imgIdArr.includes(id)) {
                     const index = imgIdArr.indexOf(id);
@@ -546,8 +552,8 @@ buttonDownloadAll.addEventListener("click", function (e) {
             const isAllCheck = false;
             Array.from(document.querySelectorAll("input[type=checkbox]")).forEach((el) => (el.checked = isAllCheck));
             for (let i = 0; i < imgIdArr.length; i++) {
-                const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwordData(imgIdArr[i]);
-                urlArr.push(_utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.classifiedPageCount(data));
+                const data = yield _utils_api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwork(imgIdArr[i]);
+                urlArr.push(_utils_classified__WEBPACK_IMPORTED_MODULE_2__.Utils.classifiedPageCount(data));
             }
             const flatUrl = urlArr.flat();
             const response = flatUrl.map((artworkAfterClassified) => {
@@ -611,9 +617,9 @@ function readContentLength(contentLength, reader, processBar, myProgress1) {
             processBar.innerHTML =
                 Math.floor((receivedLength / contentLength) * 100) + "%";
         }
-        if (receivedLength == contentLength ||
-            processBar.innerHTML == "100%" ||
-            processBar.innerHTML == "Infinity%") {
+        if (receivedLength === contentLength ||
+            processBar.innerHTML === "100%" ||
+            processBar.innerHTML === "Infinity%") {
             myProgress1.style.display = "none";
             processBar.style.width = 0 + "%";
             processBar.innerHTML = 0 + "%";
@@ -622,7 +628,6 @@ function readContentLength(contentLength, reader, processBar, myProgress1) {
 }
 function asyncEachUrl(array, callback) {
     return __awaiter(this, void 0, void 0, function* () {
-        // let countTime = 0;
         for (let index = 0; index < array.length; index++) {
             yield callback(array[index], index, array);
         }
@@ -631,9 +636,9 @@ function asyncEachUrl(array, callback) {
 function checkImage(url) {
     return __awaiter(this, void 0, void 0, function* () {
         queue = [];
-        const data = yield _utils_checkUrl__WEBPACK_IMPORTED_MODULE_2__.checkURL.checkData(url);
-        const nameArtist = data.body.userName;
-        const count = data.body.pageCount;
+        const data = yield _utils_classified__WEBPACK_IMPORTED_MODULE_2__.Utils.checkData(url);
+        const nameArtist = (data === null || data === void 0 ? void 0 : data.body.userName) || '';
+        const count = data.body.pageCount || 0;
         const urlFromAPI = data.body.urls.original;
         if (data.body.pageCount <= 1) {
             const responseafterdownload = yield getUrlAfterDownload(urlFromAPI, nameArtist);
@@ -717,7 +722,7 @@ chrome.storage.local.get("arrUrl1", function (res) {
         }
     });
 });
-(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.clearImageUrl)();
+(0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.clearImage)();
 
 })();
 

@@ -1,15 +1,12 @@
-import { ArtworkData } from './../utils/api';
 import { API, myHeaders } from "../utils/api";
 import {
   getImageUrl,
-  clearImageUrl,
+  clearImage,
   getImageUrlOriginal,
 } from "../utils/storage";
-import { checkURL, idReg, checkboxCss, 
-  buttonCss, myImagecss, buttonDownloadAllCss ,
-  
+import { Utils, idPixiv } from "../utils/classified";
+import { checkboxCss, buttonCss, myImagecss, buttonDownloadAllCss  } from '../../style/button';
 
-} from "../utils/checkUrl";
 
 function downloadImage(url: string, msg = "undifined") {
   return new Promise((resolve, reject) => {
@@ -91,7 +88,7 @@ setInterval(() => {
       checkbox.addEventListener("click", function (e: any) {
         e.stopPropagation();
 
-        const id = e.path[1].innerHTML.match(idReg)[0];
+        const id = e.path[1].innerHTML.match(idPixiv)[0];
         // check if the id is already in array
         if (imgIdArr.includes(id)) {
           const index = imgIdArr.indexOf(id);
@@ -118,7 +115,6 @@ setInterval(() => {
 }, 100);
 
 buttonDownloadAll.addEventListener("click", async function (e) {
-
   if (imgIdArr.length > 0) {
     const urlArr = [];
 
@@ -127,8 +123,8 @@ buttonDownloadAll.addEventListener("click", async function (e) {
       (el: any) => (el.checked = isAllCheck)
     );
     for (let i = 0; i < imgIdArr.length; i++) {
-      const data = await API.getArtwordData(imgIdArr[i]);
-      urlArr.push(checkURL.classifiedPageCount(data));
+      const data = await API.getArtwork(imgIdArr[i]);
+      urlArr.push(Utils.classifiedPageCount(data));
     }
     const flatUrl: any[] = urlArr.flat();
     const response = flatUrl.map((artworkAfterClassified) => {
@@ -153,22 +149,22 @@ myProgress.appendChild(processBar);
 
 async function createProcess(responseafterdownload, filename, urlFromAPI) {
 
-  myProgress.style.width = "100px";
-  myProgress.style.height = "10px";
-  myProgress.style.backgroundColor = "#ddd";
-  myProgress.style.display = "none";
-  processBar.style.fontSize = "15px";
-  processBar.style.width = "10%";
-  processBar.style.height = "10px";
-  myProgress.style.zIndex = "1000";
-  processBar.style.backgroundColor = "#04AA6D";
-  myProgress.style.position = "fixed";
-  myProgress.style.right = "0";
-  myProgress.style.bottom = "0";
-  myProgress.style.padding = "0.5rem";
-  myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
-  myProgress.style.display = "block";
-  processBar.style.display = "block";
+  myProgress.style.width= "100px";
+  myProgress.style.height= "10px";
+  myProgress.style.backgroundColor= "#ddd";
+  myProgress.style.display= "none";
+  processBar.style.fontSize= "15px";
+  processBar.style.width= "10%";
+  processBar.style.height= "10px";
+  myProgress.style.zIndex= "1000";
+  processBar.style.backgroundColor= "#04AA6D";
+  myProgress.style.position= "fixed";
+  myProgress.style.right= "0";
+  myProgress.style.bottom= "0";
+  myProgress.style.padding= "0.5rem";
+  myProgress.style.margin= "0.5rem 0.5rem 0.5rem 0";
+  myProgress.style.display= "block";
+  processBar.style.display= "block";
   body.appendChild(myProgress);
   let dataDownload = await responseafterdownload.clone();
   const reader = dataDownload.body.getReader();
@@ -178,7 +174,6 @@ async function createProcess(responseafterdownload, filename, urlFromAPI) {
     const url = URL.createObjectURL(blob);
     sendDownload(url, filename);
   });
-
 }
 
 
@@ -202,9 +197,9 @@ async function readContentLength(
   }
 
   if (
-    receivedLength == contentLength ||
-    processBar.innerHTML == "100%" ||
-    processBar.innerHTML == "Infinity%"
+    receivedLength === contentLength ||
+    processBar.innerHTML === "100%" ||
+    processBar.innerHTML === "Infinity%"
   ) {
     myProgress1.style.display = "none";
     processBar.style.width = 0 + "%";
@@ -215,7 +210,6 @@ async function readContentLength(
 
 
 async function asyncEachUrl(array, callback) {
-  // let countTime = 0;
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
@@ -223,9 +217,9 @@ async function asyncEachUrl(array, callback) {
 
 async function checkImage(url: string) {
   queue = []
-  const data = await checkURL.checkData(url);
-  const nameArtist = data.body.userName;
-  const count = data.body.pageCount;
+  const data = await Utils.checkData(url);
+  const nameArtist = data?.body.userName || '';
+  const count = data.body.pageCount || 0;
   const urlFromAPI = data.body.urls.original;
   if (data.body.pageCount <= 1) {
     const responseafterdownload = await getUrlAfterDownload(
@@ -313,22 +307,21 @@ getImageUrlOriginal().then(async (res) => {
 
 chrome.storage.local.get("arrUrl1", async function (res) {
   if (res || res.arrUrl1.length > 0) {
-
     const response = res.arrUrl1.map((url) => {
       return downloadImage(url);
     });
     let timeWaitToResolve = 2000
-   
+
     await new Promise<void>((resolve) => {
       setTimeout(() => {
         if(res.isClose == 1){
           chrome.runtime.sendMessage({ notification: "Close" })
-        } 
+        }
         resolve();
-      },timeWaitToResolve);
+      }, timeWaitToResolve);
     });
     await Promise.all(response);
   }
 });
 
-clearImageUrl();
+clearImage();

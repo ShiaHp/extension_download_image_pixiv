@@ -10,12 +10,10 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "buttonDownloadAllCss": () => (/* binding */ buttonDownloadAllCss),
-/* harmony export */   "checkboxCss": () => (/* binding */ checkboxCss),
-/* harmony export */   "buttonCss": () => (/* binding */ buttonCss),
-/* harmony export */   "myImagecss": () => (/* binding */ myImagecss),
-/* harmony export */   "myProgresscss": () => (/* binding */ myProgresscss),
-/* harmony export */   "processBarcss": () => (/* binding */ processBarcss)
+/* harmony export */   buttonDownloadAllCss: () => (/* binding */ buttonDownloadAllCss),
+/* harmony export */   checkboxCss: () => (/* binding */ checkboxCss),
+/* harmony export */   myImagecss: () => (/* binding */ myImagecss),
+/* harmony export */   processBarcss: () => (/* binding */ processBarcss)
 /* harmony export */ });
 const buttonDownloadAllCss = `
 .styleButtonAll{
@@ -49,26 +47,6 @@ const checkboxCss = `
   background-color: rgba(255, 255, 255, 0.5rem);
 }
 `;
-const buttonCss = `
-.buttonCss {
-  z-index: 9999;
-  background-color: #52e010;
-  border-radius: 5px;
-  font-size: 18px;
-  align-content: center;
-  color: #fff;
-  position : absolute;
-  right: 0;
-  top: 1rem;
-  padding: 0.5rem;
-  margin: 0.5rem 0.5rem 0.5rem 0;
-  transition: 0.2s all;
-  cursor: pointer;
-  transform: scale(0.98);
-  opacity: 0.5rem;
-  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
-}
-`;
 const myImagecss = `
 .myImage {
   borderRadius: 5px;
@@ -77,21 +55,6 @@ const myImagecss = `
   width: 150px;
 }
 
-`;
-const myProgresscss = `
-  .myProgress {
-    width: 100px;
-    height: 10px;
-    backgroundColor: #ddd;
-    display: none;
-    zIndex: 1000;
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    padding: 0.5rem;
-    margin: 0.5rem 0.5rem 0.5rem 0;
-    display: block;
-}
 `;
 const processBarcss = `
   .processBar {
@@ -114,8 +77,9 @@ const processBarcss = `
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "myHeaders": () => (/* binding */ myHeaders),
-/* harmony export */   "API": () => (/* binding */ API)
+/* harmony export */   API: () => (/* binding */ API),
+/* harmony export */   myHeaders: () => (/* binding */ myHeaders),
+/* harmony export */   requestOptions: () => (/* binding */ requestOptions)
 /* harmony export */ });
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -211,11 +175,11 @@ class API {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "idPixiv": () => (/* binding */ idPixiv),
-/* harmony export */   "idTweet": () => (/* binding */ idTweet),
-/* harmony export */   "format_pixiv": () => (/* binding */ format_pixiv),
-/* harmony export */   "format_twitter": () => (/* binding */ format_twitter),
-/* harmony export */   "Utils": () => (/* binding */ Utils)
+/* harmony export */   Utils: () => (/* binding */ Utils),
+/* harmony export */   format_pixiv: () => (/* binding */ format_pixiv),
+/* harmony export */   format_twitter: () => (/* binding */ format_twitter),
+/* harmony export */   idPixiv: () => (/* binding */ idPixiv),
+/* harmony export */   idTweet: () => (/* binding */ idTweet)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/ts/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -228,7 +192,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idPixiv = /\/artworks\/(\d+)/;
+const idPixiv = /\/(\d+)_p\d+_[\w-]+\d+\.(jpg|png|gif|bmp|jpeg|webp)$/i;
 const idTweet = /[0-9]{19,21}/;
 const format_pixiv = 0;
 const format_twitter = 1;
@@ -239,9 +203,9 @@ class Utils {
     }
     static getDataUrl(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = url.match(idPixiv)[0];
+            const id = url.match(idPixiv)[1];
             const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwork(id);
-            return data;
+            return data || {};
         });
     }
     static checkData(url) {
@@ -278,15 +242,15 @@ class Utils {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "setStoredSingle": () => (/* binding */ setStoredSingle),
-/* harmony export */   "getStoredSingle": () => (/* binding */ getStoredSingle),
-/* harmony export */   "setImageUrlStorage": () => (/* binding */ setImageUrlStorage),
-/* harmony export */   "setImageUrlOriginalStorage": () => (/* binding */ setImageUrlOriginalStorage),
-/* harmony export */   "getImageUrlOriginal": () => (/* binding */ getImageUrlOriginal),
-/* harmony export */   "getImageUrl": () => (/* binding */ getImageUrl),
-/* harmony export */   "clearImage": () => (/* binding */ clearImage),
-/* harmony export */   "setIDArtistStorage": () => (/* binding */ setIDArtistStorage),
-/* harmony export */   "getIDArtistStorage": () => (/* binding */ getIDArtistStorage)
+/* harmony export */   clearImage: () => (/* binding */ clearImage),
+/* harmony export */   getIDArtistStorage: () => (/* binding */ getIDArtistStorage),
+/* harmony export */   getImageUrl: () => (/* binding */ getImageUrl),
+/* harmony export */   getImageUrlOriginal: () => (/* binding */ getImageUrlOriginal),
+/* harmony export */   getStoredSingle: () => (/* binding */ getStoredSingle),
+/* harmony export */   setIDArtistStorage: () => (/* binding */ setIDArtistStorage),
+/* harmony export */   setImageUrlOriginalStorage: () => (/* binding */ setImageUrlOriginalStorage),
+/* harmony export */   setImageUrlStorage: () => (/* binding */ setImageUrlStorage),
+/* harmony export */   setStoredSingle: () => (/* binding */ setStoredSingle)
 /* harmony export */ });
 function setStoredSingle(idSingle) {
     const vals = {
@@ -500,51 +464,99 @@ body.appendChild(buttonDownloadAll);
 body.appendChild(styleImage);
 body.appendChild(styleButtonAll);
 let linkImg = "";
+// Create the button and checkbox outside the interval loop
+const checkbox = document.createElement("input");
+const style = document.createElement("style");
+style.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.checkboxCss;
+checkbox.className = "stylecheckbox";
+checkbox.type = "checkbox";
+checkbox.id = "checkbox";
+document.body.appendChild(style);
+const button = document.createElement("button");
+button.innerText = "\u21E9";
+button.classList.add("buttonCss");
+button.style.opacity = "0"; // Initially set the opacity to 0 for fade-in effect
+document.body.appendChild(button);
 setInterval(() => {
     for (let i = 2; i < imagesArray.length; i++) {
         if (imagesArray.length > 2 &&
             imagesArray[i].parentElement &&
             imagesArray[i].parentElement.childNodes &&
             imagesArray[i].parentElement.childNodes.length <= 1) {
-            const checkbox = document.createElement("input");
-            const style = document.createElement("style");
-            style.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.checkboxCss;
-            checkbox.className = "stylecheckbox";
-            checkbox.type = "checkbox";
-            checkbox.id = "checkbox";
-            body.appendChild(style);
-            const button = document.createElement("button");
-            button.innerText = "\u21E9";
-            const stylebutton = document.createElement("style");
-            stylebutton.innerHTML = _style_button__WEBPACK_IMPORTED_MODULE_3__.buttonCss;
-            button.className = "buttonCss";
-            body.appendChild(stylebutton);
-            checkbox.addEventListener("click", function (e) {
-                e.stopPropagation();
-                const id = e.path[1].innerHTML.match(_utils_classified__WEBPACK_IMPORTED_MODULE_2__.idPixiv)[0];
-                // check if the id is already in array
-                if (imgIdArr.includes(id)) {
-                    const index = imgIdArr.indexOf(id);
-                    imgIdArr.splice(index, 1);
-                }
-                else {
-                    imgIdArr.push(id);
-                }
-            });
-            imagesArray[i].addEventListener("mouseover", function (e) {
+            imagesArray[i].addEventListener("mouseover", function () {
+                button.style.opacity = "1";
+                checkbox.style.opacity = "1";
+                const id = imagesArray[i].src.match(_utils_classified__WEBPACK_IMPORTED_MODULE_2__.idPixiv)[0];
                 myImage.src = this.src;
                 linkImg = this.src;
+                checkbox.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    // check if the id is already in array
+                    if (imgIdArr.includes(id)) {
+                        const index = imgIdArr.indexOf(id);
+                        imgIdArr.splice(index, 1);
+                    }
+                    else {
+                        imgIdArr.push(id);
+                    }
+                });
+                imagesArray[i].parentElement.appendChild(button);
+                imagesArray[i].parentElement.appendChild(checkbox);
+                button.onclick = function (e) {
+                    // e.stopPropagation();
+                    // e.preventDefault();
+                    checkImage(linkImg);
+                };
             });
-            imagesArray[i].parentElement.appendChild(button);
-            imagesArray[i].parentElement.appendChild(checkbox);
-            button.onclick = function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                checkImage(linkImg);
-            };
+            imagesArray[i].addEventListener("mouseout", function () {
+                button.style.opacity = "0";
+                checkbox.style.opacity = "0";
+            });
         }
     }
 }, 100);
+//   for (let i = 2; i < imagesArray.length; i++) {
+//     if (
+//       imagesArray.length > 2 &&
+//       imagesArray[i].parentElement &&
+//       imagesArray[i].parentElement.childNodes &&
+//       imagesArray[i].parentElement.childNodes.length <= 1
+//     ) {
+//       imagesArray[i].addEventListener('mouseover', function() {
+//         const checkbox = document.createElement("input");
+//       const style = document.createElement("style");
+//       style.innerHTML = checkboxCss
+//       checkbox.className = "stylecheckbox"
+//       checkbox.type = "checkbox";
+//       checkbox.id = "checkbox";
+//       body.appendChild(style)
+//       const button = document.createElement("button");
+//       button.innerText = "\u21E9";
+//       button.classList.add('buttonCss');
+//       checkbox.addEventListener("click", function (e: any) {
+//         e.stopPropagation();
+//         const id = e.path[1].innerHTML.match(idPixiv)[0];
+//         // check if the id is already in array
+//         if (imgIdArr.includes(id)) {
+//           const index = imgIdArr.indexOf(id);
+//           imgIdArr.splice(index, 1);
+//         } else {
+//           imgIdArr.push(id);
+//         }
+//       });
+//       myImage.src = this.src;
+//       linkImg = this.src;
+//       imagesArray[i].parentElement.appendChild(button);
+//       imagesArray[i].parentElement.appendChild(checkbox);
+//       button.onclick = function (e) {
+//         e.stopPropagation();
+//         e.preventDefault();
+//         checkImage(linkImg);
+//       };
+//       })
+//     }
+//   }
+// }, 100);
 buttonDownloadAll.addEventListener("click", function (e) {
     return __awaiter(this, void 0, void 0, function* () {
         if (imgIdArr.length > 0) {
@@ -576,21 +588,7 @@ processBar.setAttribute("id", "myBar");
 myProgress.appendChild(processBar);
 function createProcess(responseafterdownload, filename, urlFromAPI) {
     return __awaiter(this, void 0, void 0, function* () {
-        myProgress.style.width = "100px";
-        myProgress.style.height = "10px";
-        myProgress.style.backgroundColor = "#ddd";
-        myProgress.style.display = "none";
-        processBar.style.fontSize = "15px";
-        processBar.style.width = "10%";
-        processBar.style.height = "10px";
-        myProgress.style.zIndex = "1000";
-        processBar.style.backgroundColor = "#04AA6D";
-        myProgress.style.position = "fixed";
-        myProgress.style.right = "0";
-        myProgress.style.bottom = "0";
-        myProgress.style.padding = "0.5rem";
-        myProgress.style.margin = "0.5rem 0.5rem 0.5rem 0";
-        myProgress.style.display = "block";
+        myProgress.classList.add('myProgress');
         processBar.style.display = "block";
         body.appendChild(myProgress);
         let dataDownload = yield responseafterdownload.clone();
@@ -650,7 +648,6 @@ function checkImage(url) {
                 const responseafterdownload = yield getUrlAfterDownload(url, nameArtist);
                 queue.push(responseafterdownload);
             }
-            // limit batch download to 10 image
             asyncEachUrl(queue, (artwork) => {
                 createProcess(artwork, nameArtist, urlFromAPI);
             });
@@ -662,11 +659,6 @@ function waitToDownloadAgain(delay) {
         setTimeout(resolve, delay);
     });
 }
-const fetchOptions = {
-    method: "get",
-    credentials: "same-origin",
-    headers: _utils_api__WEBPACK_IMPORTED_MODULE_0__.myHeaders,
-};
 function getRetryDownload(newurl, delay, tries, fetchOptions) {
     function onError(err) {
         let triesLeft = tries - 1;
@@ -685,7 +677,7 @@ function getUrlAfterDownload(newurl, filename) {
             headers: _utils_api__WEBPACK_IMPORTED_MODULE_0__.myHeaders,
         }).catch((e) => __awaiter(this, void 0, void 0, function* () {
             chrome.runtime.sendMessage({ notification: `reloadextension"` });
-            const responseafterdownload = yield getRetryDownload(newurl, 3000, 5, fetchOptions);
+            const responseafterdownload = yield getRetryDownload(newurl, 3000, 5, _utils_api__WEBPACK_IMPORTED_MODULE_0__.requestOptions);
             return responseafterdownload;
         }));
         return responseafterdownload;
@@ -703,25 +695,23 @@ function sendDownload(urlInput, filename) {
         downloadImage(res, 'Close');
     }
 }));
-chrome.storage.local.get("arrUrl1", function (res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (res || res.arrUrl1.length > 0) {
-            const response = res.arrUrl1.map((url) => {
-                return downloadImage(url);
-            });
-            let timeWaitToResolve = 2000;
-            yield new Promise((resolve) => {
-                setTimeout(() => {
-                    if (res.isClose == 1) {
-                        chrome.runtime.sendMessage({ notification: "Close" });
-                    }
-                    resolve();
-                }, timeWaitToResolve);
-            });
-            yield Promise.all(response);
-        }
-    });
-});
+// chrome.storage.local.get("arrUrl1", async function (res) {
+//   if (res || res.arrUrl1.length > 0) {
+//     const response = res.arrUrl1.map((url) => {
+//       return downloadImage(url);
+//     });
+//     let timeWaitToResolve = 2000
+//     await new Promise<void>((resolve) => {
+//       setTimeout(() => {
+//         if(res.isClose == 1){
+//           chrome.runtime.sendMessage({ notification: "Close" })
+//         }
+//         resolve();
+//       }, timeWaitToResolve);
+//     });
+//     await Promise.all(response);
+//   }
+// });
 (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.clearImage)();
 
 })();

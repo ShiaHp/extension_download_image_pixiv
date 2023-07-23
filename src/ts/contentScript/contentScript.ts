@@ -1,13 +1,13 @@
-import { API, myHeaders } from "../utils/api";
+import { API, myHeaders, requestOptions } from "../utils/api";
 import {
   getImageUrl,
   clearImage,
   getImageUrlOriginal,
 } from "../utils/storage";
 import { Utils, idPixiv } from "../utils/classified";
-import { checkboxCss, buttonCss, buttonDownloadAllCss  } from '../../style/button';
+import { checkboxCss, buttonDownloadAllCss  } from '../../style/button';
 import { toast } from "../toast/toast";
-
+import { get } from 'lodash';
 function downloadImage(url: string, msg = "undifined") {
   return new Promise((resolve, reject) => {
     fetch(url, {
@@ -61,6 +61,23 @@ body.appendChild(styleImage)
 body.appendChild(styleButtonAll);
 let linkImg = "";
 
+
+
+// Create the button and checkbox outside the interval loop
+const checkbox = document.createElement("input");
+const style = document.createElement("style");
+style.innerHTML = checkboxCss;
+checkbox.className = "stylecheckbox";
+checkbox.type = "checkbox";
+checkbox.id = "checkbox";
+document.body.appendChild(style);
+
+const button = document.createElement("button");
+button.innerText = "\u21E9";
+button.classList.add("buttonCss");
+button.style.opacity = "0"; // Initially set the opacity to 0 for fade-in effect
+document.body.appendChild(button);
+
 setInterval(() => {
   for (let i = 2; i < imagesArray.length; i++) {
     if (
@@ -69,75 +86,120 @@ setInterval(() => {
       imagesArray[i].parentElement.childNodes &&
       imagesArray[i].parentElement.childNodes.length <= 1
     ) {
-      const checkbox = document.createElement("input");
-      const style = document.createElement("style");
-      style.innerHTML = checkboxCss
-      checkbox.className = "stylecheckbox"
-      checkbox.type = "checkbox";
-      checkbox.id = "checkbox";
-      body.appendChild(style)
 
+      imagesArray[i].addEventListener("mouseover", function () {
+        button.style.opacity = "1";
+        checkbox.style.opacity = "1";
+        const id = imagesArray[i].src.match(idPixiv)[0];
 
-      const button = document.createElement("button");
-      button.innerText = "\u21E9";
-      const stylebutton = document.createElement("style");
-      stylebutton.innerHTML = buttonCss
-      button.className = "buttonCss"
-      body.appendChild(stylebutton)
-
-      checkbox.addEventListener("click", function (e: any) {
-        e.stopPropagation();
-
-        const id = e.path[1].innerHTML.match(idPixiv)[0];
-        // check if the id is already in array
-        if (imgIdArr.includes(id)) {
-          const index = imgIdArr.indexOf(id);
-          imgIdArr.splice(index, 1);
-        } else {
-          imgIdArr.push(id);
-        }
-      });
-
-      imagesArray[i].addEventListener("mouseover", function (e) {
         myImage.src = this.src;
         linkImg = this.src;
-      });
-      imagesArray[i].parentElement.appendChild(button);
-      imagesArray[i].parentElement.appendChild(checkbox);
+        checkbox.addEventListener("click", function (e) {
+          e.stopPropagation();
 
-      button.onclick = function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        checkImage(linkImg);
-      };
+          // check if the id is already in array
+          if (imgIdArr.includes(id)) {
+            const index = imgIdArr.indexOf(id);
+            imgIdArr.splice(index, 1);
+          } else {
+            imgIdArr.push(id);
+          }
+        });
+
+        imagesArray[i].parentElement.appendChild(button);
+        imagesArray[i].parentElement.appendChild(checkbox);
+
+        button.onclick = function (e) {
+          // e.stopPropagation();
+          // e.preventDefault();
+          checkImage(linkImg);
+        };
+      });
+
+      imagesArray[i].addEventListener("mouseout", function () {
+        button.style.opacity = "0";
+        checkbox.style.opacity = "0";
+      });
     }
   }
 }, 100);
 
+//   for (let i = 2; i < imagesArray.length; i++) {
+//     if (
+//       imagesArray.length > 2 &&
+//       imagesArray[i].parentElement &&
+//       imagesArray[i].parentElement.childNodes &&
+//       imagesArray[i].parentElement.childNodes.length <= 1
+//     ) {
+//       imagesArray[i].addEventListener('mouseover', function() {
+//         const checkbox = document.createElement("input");
+//       const style = document.createElement("style");
+//       style.innerHTML = checkboxCss
+//       checkbox.className = "stylecheckbox"
+//       checkbox.type = "checkbox";
+//       checkbox.id = "checkbox";
+//       body.appendChild(style)
+
+
+//       const button = document.createElement("button");
+//       button.innerText = "\u21E9";
+//       button.classList.add('buttonCss');
+
+
+//       checkbox.addEventListener("click", function (e: any) {
+//         e.stopPropagation();
+
+//         const id = e.path[1].innerHTML.match(idPixiv)[0];
+//         // check if the id is already in array
+//         if (imgIdArr.includes(id)) {
+//           const index = imgIdArr.indexOf(id);
+//           imgIdArr.splice(index, 1);
+//         } else {
+//           imgIdArr.push(id);
+//         }
+//       });
+//       myImage.src = this.src;
+//       linkImg = this.src;
+//       imagesArray[i].parentElement.appendChild(button);
+//       imagesArray[i].parentElement.appendChild(checkbox);
+
+//       button.onclick = function (e) {
+//         e.stopPropagation();
+//         e.preventDefault();
+//         checkImage(linkImg);
+//       };
+//       })
+
+//     }
+//   }
+// }, 100);
+
+
+
+
 buttonDownloadAll.addEventListener("click", async function (e) {
-  toast.success('Life ís not so fine', '', { enter: 'up', leave: 'fade', position: 'topCenter'});
-  // if (imgIdArr.length > 0) {
-  //   const urlArr = [];
+  if (imgIdArr.length > 0) {
+    const urlArr = [];
 
-  //   const isAllCheck = false;
-  //   Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
-  //     (el: any) => (el.checked = isAllCheck)
-  //   );
-  //   for (let i = 0; i < imgIdArr.length; i++) {
-  //     const data = await API.getArtwork(imgIdArr[i]);
-  //     urlArr.push(Utils.classifiedPageCount(data));
-  //   }
-  //   const flatUrl: any[] = urlArr.flat();
-  //   const response = flatUrl.map((artworkAfterClassified) => {
-  //     return downloadImage(artworkAfterClassified);
-  //   })
+    const isAllCheck = false;
+    Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
+      (el: any) => (el.checked = isAllCheck)
+    );
+    for (let i = 0; i < imgIdArr.length; i++) {
+      const data = await API.getArtwork(imgIdArr[i]);
+      urlArr.push(Utils.classifiedPageCount(data));
+    }
+    const flatUrl: any[] = urlArr.flat();
+    const response = flatUrl.map((artworkAfterClassified) => {
+      return downloadImage(artworkAfterClassified);
+    })
 
-  //   await Promise.all(response).then(() => {
-  //     imgIdArr = [];
-  //   })
-  // } else {
-  //   alert("Please select an artwork");
-  // }
+    await Promise.all(response).then(() => {
+      imgIdArr = [];
+    })
+  } else {
+    alert("Please select an artwork");
+  }
 });
 
 let queue = [];
@@ -150,21 +212,7 @@ myProgress.appendChild(processBar);
 
 async function createProcess(responseafterdownload, filename, urlFromAPI) {
 
-  myProgress.style.width= "100px";
-  myProgress.style.height= "10px";
-  myProgress.style.backgroundColor= "#ddd";
-  myProgress.style.display= "none";
-  processBar.style.fontSize= "15px";
-  processBar.style.width= "10%";
-  processBar.style.height= "10px";
-  myProgress.style.zIndex= "1000";
-  processBar.style.backgroundColor= "#04AA6D";
-  myProgress.style.position= "fixed";
-  myProgress.style.right= "0";
-  myProgress.style.bottom= "0";
-  myProgress.style.padding= "0.5rem";
-  myProgress.style.margin= "0.5rem 0.5rem 0.5rem 0";
-  myProgress.style.display= "block";
+  myProgress.classList.add('myProgress')
   processBar.style.display= "block";
   body.appendChild(myProgress);
   let dataDownload = await responseafterdownload.clone();
@@ -236,7 +284,6 @@ async function checkImage(url: string) {
       queue.push(responseafterdownload);
     }
 
-    // limit batch download to 10 image
     asyncEachUrl(queue, (artwork) => {
       createProcess(artwork, nameArtist, urlFromAPI)
     });
@@ -249,11 +296,7 @@ function waitToDownloadAgain(delay: number) {
     setTimeout(resolve, delay);
   });
 }
-const fetchOptions = {
-  method: "get",
-  credentials: "same-origin",
-  headers: myHeaders,
-};
+
 function getRetryDownload(
   newurl: string,
   delay: number,
@@ -284,7 +327,7 @@ async function getUrlAfterDownload(newurl: string, filename: string) {
       newurl,
       3000,
       5,
-      fetchOptions
+      requestOptions
     );
     return responseafterdownload;
   });

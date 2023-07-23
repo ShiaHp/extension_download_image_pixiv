@@ -18,13 +18,13 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
         test: /\.(jpg|jpeg|png|woff|woff2|eot|ttf|svg)$/,
         type: 'asset/resource'
-      }
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
     ]
   },
   resolve: {
@@ -39,6 +39,10 @@ module.exports = {
         {
           from: path.resolve('src/static'),
           to: path.resolve('dist'),
+        },
+        {
+          from: path.resolve('./src/style'),
+          to: path.resolve('dist')
         }
       ]
     }),

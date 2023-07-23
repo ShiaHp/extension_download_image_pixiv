@@ -1,13 +1,14 @@
 import { Artwork } from "../interface/artwork";
 
+
 export const myHeaders = new Headers();
 myHeaders.append("sec-fetch-site", "cross-site");
 myHeaders.append("referer", "https://www.pixiv.net/");
-const requestOptions = {
+
+export const requestOptions = {
   method: "GET",
   headers: myHeaders,
 };
-
 export class API {
   static sendGetRequest<T>(url: string): Promise<T> {
     return new Promise((resolve, reject) => {

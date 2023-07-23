@@ -4,16 +4,6 @@ import {
   setImageUrlOriginalStorage,
 } from "../utils/storage";
 import { API } from "../utils/api";
-import { responseListener } from './header'
-
-// REQUEST REGION
-// chrome.webRequest.onHeadersReceived.addListener(
-//   responseListener,
-//   {
-//     urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
-//   },
-//   ["blocking", "responseHeaders", "extraHeaders"]
-// );
 
 const callAPI = async (id: string, type: number): Promise<object> => {
   const apiName = {
@@ -71,17 +61,28 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "Download image from this code",
     id: "download-image",
   });
+});
 
-});
 chrome.contextMenus.onClicked.addListener((event) => {
-  if (event.selectionText) {
-    functionDownloadImage(event.selectionText, format_pixiv );
-  } else {
-    const typeToCheck: number = Utils.isPixiv(event.linkUrl)
-    const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idPixiv)[0] : event.linkUrl.match(idTweet)[0]
-    functionDownloadImage(exactName, typeToCheck);
+  const types = ['selectionText', 'linkUrl'];
+  const eventTypes = types.filter(type => Object.keys(event).includes(type));
+
+  if (eventTypes.includes('selectionText')) {
+    // case text: priority higher
+    // todo
+  } else if (eventTypes.includes('linkUrl')) {
+    const belongsToWhatPlatform = Utils.isPixiv(event.linkUrl);
+
   }
+  // if (event.selectionText) {
+  //   functionDownloadImage(event.selectionText, format_pixiv );
+  // } else {
+  //   const typeToCheck: number = Utils.isPixiv(event.linkUrl)
+  //   const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idPixiv)[0] : event.linkUrl.match(idTweet)[0]
+  //   functionDownloadImage(exactName, typeToCheck);
+  // }
 });
+
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
 

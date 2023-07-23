@@ -2,37 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/ts/background/header.ts":
-/*!*************************************!*\
-  !*** ./src/ts/background/header.ts ***!
-  \*************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "removeMatchingHeaders": () => (/* binding */ removeMatchingHeaders),
-/* harmony export */   "responseListener": () => (/* binding */ responseListener)
-/* harmony export */ });
-const regex = /access-control-allow-origin/i;
-const removeMatchingHeaders = (headers, regex) => {
-    for (let i = 0, header; (header = headers[i]); i++) {
-        if (header.name.match(regex)) {
-            headers.splice(i, 1);
-            return;
-        }
-    }
-};
-const responseListener = (details) => {
-    removeMatchingHeaders(details.responseHeaders, regex);
-    details.responseHeaders.push({
-        name: "access-control-allow-origin",
-        value: "*",
-    });
-};
-
-
-/***/ }),
-
 /***/ "./src/ts/utils/api.ts":
 /*!*****************************!*\
   !*** ./src/ts/utils/api.ts ***!
@@ -41,8 +10,9 @@ const responseListener = (details) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "myHeaders": () => (/* binding */ myHeaders),
-/* harmony export */   "API": () => (/* binding */ API)
+/* harmony export */   API: () => (/* binding */ API),
+/* harmony export */   myHeaders: () => (/* binding */ myHeaders),
+/* harmony export */   requestOptions: () => (/* binding */ requestOptions)
 /* harmony export */ });
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -138,11 +108,11 @@ class API {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "idPixiv": () => (/* binding */ idPixiv),
-/* harmony export */   "idTweet": () => (/* binding */ idTweet),
-/* harmony export */   "format_pixiv": () => (/* binding */ format_pixiv),
-/* harmony export */   "format_twitter": () => (/* binding */ format_twitter),
-/* harmony export */   "Utils": () => (/* binding */ Utils)
+/* harmony export */   Utils: () => (/* binding */ Utils),
+/* harmony export */   format_pixiv: () => (/* binding */ format_pixiv),
+/* harmony export */   format_twitter: () => (/* binding */ format_twitter),
+/* harmony export */   idPixiv: () => (/* binding */ idPixiv),
+/* harmony export */   idTweet: () => (/* binding */ idTweet)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/ts/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -155,7 +125,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const idPixiv = /\/artworks\/(\d+)/;
+const idPixiv = /\/(\d+)_p\d+_[\w-]+\d+\.(jpg|png|gif|bmp|jpeg|webp)$/i;
 const idTweet = /[0-9]{19,21}/;
 const format_pixiv = 0;
 const format_twitter = 1;
@@ -166,9 +136,9 @@ class Utils {
     }
     static getDataUrl(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = url.match(idPixiv)[0];
+            const id = url.match(idPixiv)[1];
             const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwork(id);
-            return data;
+            return data || {};
         });
     }
     static checkData(url) {
@@ -205,15 +175,15 @@ class Utils {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "setStoredSingle": () => (/* binding */ setStoredSingle),
-/* harmony export */   "getStoredSingle": () => (/* binding */ getStoredSingle),
-/* harmony export */   "setImageUrlStorage": () => (/* binding */ setImageUrlStorage),
-/* harmony export */   "setImageUrlOriginalStorage": () => (/* binding */ setImageUrlOriginalStorage),
-/* harmony export */   "getImageUrlOriginal": () => (/* binding */ getImageUrlOriginal),
-/* harmony export */   "getImageUrl": () => (/* binding */ getImageUrl),
-/* harmony export */   "clearImage": () => (/* binding */ clearImage),
-/* harmony export */   "setIDArtistStorage": () => (/* binding */ setIDArtistStorage),
-/* harmony export */   "getIDArtistStorage": () => (/* binding */ getIDArtistStorage)
+/* harmony export */   clearImage: () => (/* binding */ clearImage),
+/* harmony export */   getIDArtistStorage: () => (/* binding */ getIDArtistStorage),
+/* harmony export */   getImageUrl: () => (/* binding */ getImageUrl),
+/* harmony export */   getImageUrlOriginal: () => (/* binding */ getImageUrlOriginal),
+/* harmony export */   getStoredSingle: () => (/* binding */ getStoredSingle),
+/* harmony export */   setIDArtistStorage: () => (/* binding */ setIDArtistStorage),
+/* harmony export */   setImageUrlOriginalStorage: () => (/* binding */ setImageUrlOriginalStorage),
+/* harmony export */   setImageUrlStorage: () => (/* binding */ setImageUrlStorage),
+/* harmony export */   setStoredSingle: () => (/* binding */ setStoredSingle)
 /* harmony export */ });
 function setStoredSingle(idSingle) {
     const vals = {
@@ -364,7 +334,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_classified__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/classified */ "./src/ts/utils/classified.ts");
 /* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/storage */ "./src/ts/utils/storage.ts");
 /* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/api */ "./src/ts/utils/api.ts");
-/* harmony import */ var _header__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./header */ "./src/ts/background/header.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -377,11 +346,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-
-// REQUEST REGION
-chrome.webRequest.onHeadersReceived.addListener(_header__WEBPACK_IMPORTED_MODULE_3__.responseListener, {
-    urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
-}, ["blocking", "responseHeaders", "extraHeaders"]);
 const callAPI = (id, type) => __awaiter(void 0, void 0, void 0, function* () {
     const apiName = {
         0: _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtwork(id),
@@ -435,14 +399,22 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 chrome.contextMenus.onClicked.addListener((event) => {
-    if (event.selectionText) {
-        functionDownloadImage(event.selectionText, _utils_classified__WEBPACK_IMPORTED_MODULE_0__.format_pixiv);
+    const types = ['selectionText', 'linkUrl'];
+    const eventTypes = types.filter(type => Object.keys(event).includes(type));
+    if (eventTypes.includes('selectionText')) {
+        // case text: priority higher
+        // todo
     }
-    else {
-        const typeToCheck = _utils_classified__WEBPACK_IMPORTED_MODULE_0__.Utils.isPixiv(event.linkUrl);
-        const exactName = typeToCheck == _utils_classified__WEBPACK_IMPORTED_MODULE_0__.format_pixiv ? event.linkUrl.match(_utils_classified__WEBPACK_IMPORTED_MODULE_0__.idPixiv)[0] : event.linkUrl.match(_utils_classified__WEBPACK_IMPORTED_MODULE_0__.idTweet)[0];
-        functionDownloadImage(exactName, typeToCheck);
+    else if (eventTypes.includes('linkUrl')) {
+        const belongsToWhatPlatform = _utils_classified__WEBPACK_IMPORTED_MODULE_0__.Utils.isPixiv(event.linkUrl);
     }
+    // if (event.selectionText) {
+    //   functionDownloadImage(event.selectionText, format_pixiv );
+    // } else {
+    //   const typeToCheck: number = Utils.isPixiv(event.linkUrl)
+    //   const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idPixiv)[0] : event.linkUrl.match(idTweet)[0]
+    //   functionDownloadImage(exactName, typeToCheck);
+    // }
 });
 chrome.runtime.onMessage.addListener(function (request) {
     const data = request.data || 1;

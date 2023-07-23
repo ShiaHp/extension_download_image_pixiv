@@ -1,0 +1,20 @@
+.xzToast {
+  position: fixed;
+  width: auto;
+  z-index: 9999999;
+  margin: auto;
+  font-size: 14px;
+  pointer-events: none;
+  display: inline-block;
+  max-width: 500px;
+  color: #fff;
+  background-color: aqua;
+  padding: 8px 10px;
+  border-radius: 4px;
+
+}
+
+.toast-text {
+  font-size: 14px;
+  color: #777;
+}

@@ -5,8 +5,8 @@ import {
   getImageUrlOriginal,
 } from "../utils/storage";
 import { Utils, idPixiv } from "../utils/classified";
-import { checkboxCss, buttonCss, myImagecss, buttonDownloadAllCss  } from '../../style/button';
-
+import { checkboxCss, buttonCss, buttonDownloadAllCss  } from '../../style/button';
+import { toast } from "../toast/toast";
 
 function downloadImage(url: string, msg = "undifined") {
   return new Promise((resolve, reject) => {
@@ -115,28 +115,29 @@ setInterval(() => {
 }, 100);
 
 buttonDownloadAll.addEventListener("click", async function (e) {
-  if (imgIdArr.length > 0) {
-    const urlArr = [];
+  toast.success('Life ís not so fine', '', { enter: 'up', leave: 'fade', position: 'topCenter'});
+  // if (imgIdArr.length > 0) {
+  //   const urlArr = [];
 
-    const isAllCheck = false;
-    Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
-      (el: any) => (el.checked = isAllCheck)
-    );
-    for (let i = 0; i < imgIdArr.length; i++) {
-      const data = await API.getArtwork(imgIdArr[i]);
-      urlArr.push(Utils.classifiedPageCount(data));
-    }
-    const flatUrl: any[] = urlArr.flat();
-    const response = flatUrl.map((artworkAfterClassified) => {
-      return downloadImage(artworkAfterClassified);
-    })
+  //   const isAllCheck = false;
+  //   Array.from(document.querySelectorAll("input[type=checkbox]")).forEach(
+  //     (el: any) => (el.checked = isAllCheck)
+  //   );
+  //   for (let i = 0; i < imgIdArr.length; i++) {
+  //     const data = await API.getArtwork(imgIdArr[i]);
+  //     urlArr.push(Utils.classifiedPageCount(data));
+  //   }
+  //   const flatUrl: any[] = urlArr.flat();
+  //   const response = flatUrl.map((artworkAfterClassified) => {
+  //     return downloadImage(artworkAfterClassified);
+  //   })
 
-    await Promise.all(response).then(() => {
-      imgIdArr = [];
-    })
-  } else {
-    alert("Please select an artwork");
-  }
+  //   await Promise.all(response).then(() => {
+  //     imgIdArr = [];
+  //   })
+  // } else {
+  //   alert("Please select an artwork");
+  // }
 });
 
 let queue = [];
@@ -305,23 +306,23 @@ getImageUrlOriginal().then(async (res) => {
   }
 });
 
-chrome.storage.local.get("arrUrl1", async function (res) {
-  if (res || res.arrUrl1.length > 0) {
-    const response = res.arrUrl1.map((url) => {
-      return downloadImage(url);
-    });
-    let timeWaitToResolve = 2000
+// chrome.storage.local.get("arrUrl1", async function (res) {
+//   if (res || res.arrUrl1.length > 0) {
+//     const response = res.arrUrl1.map((url) => {
+//       return downloadImage(url);
+//     });
+//     let timeWaitToResolve = 2000
 
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        if(res.isClose == 1){
-          chrome.runtime.sendMessage({ notification: "Close" })
-        }
-        resolve();
-      }, timeWaitToResolve);
-    });
-    await Promise.all(response);
-  }
-});
+//     await new Promise<void>((resolve) => {
+//       setTimeout(() => {
+//         if(res.isClose == 1){
+//           chrome.runtime.sendMessage({ notification: "Close" })
+//         }
+//         resolve();
+//       }, timeWaitToResolve);
+//     });
+//     await Promise.all(response);
+//   }
+// });
 
 clearImage();

@@ -1,7 +1,7 @@
 import { Artwork } from './../interface/artwork';
 import { API } from "./api";
 
-export const idPixiv = /\/artworks\/(\d+)/;
+export const idPixiv = /\/(\d+)_p\d+_[\w-]+\d+\.(jpg|png|gif|bmp|jpeg|webp)$/i;
 export const idTweet = /[0-9]{19,21}/;
 export const format_pixiv: number = 0;
 export const format_twitter: number = 1;
@@ -13,9 +13,9 @@ export class Utils {
   }
 
   static async getDataUrl(url: string): Promise<Artwork> {
-    const id = url.match(idPixiv)[0];
+    const id = url.match(idPixiv)[1];
     const data = await API.getArtwork(id);
-    return data;
+    return data || {};
   }
 
   static async checkData(url: string) {

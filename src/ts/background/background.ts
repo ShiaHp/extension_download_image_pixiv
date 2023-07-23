@@ -7,13 +7,13 @@ import { API } from "../utils/api";
 import { responseListener } from './header'
 
 // REQUEST REGION
-chrome.webRequest.onHeadersReceived.addListener(
-  responseListener,
-  {
-    urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
-  },
-  ["blocking", "responseHeaders", "extraHeaders"]
-);
+// chrome.webRequest.onHeadersReceived.addListener(
+//   responseListener,
+//   {
+//     urls: ["*://*.pximg.net/*", "*://*.pixiv.cat/*"],
+//   },
+//   ["blocking", "responseHeaders", "extraHeaders"]
+// );
 
 const callAPI = async (id: string, type: number): Promise<object> => {
   const apiName = {

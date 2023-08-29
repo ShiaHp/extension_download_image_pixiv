@@ -39,9 +39,7 @@ export const myImagecss =`
   padding: 5px;
   width: 150px;
 }
-
 `
-
 
 export const processBarcss = `
   .processBar {
@@ -52,3 +50,5 @@ export const processBarcss = `
     display: block;
   }
 `
+
+

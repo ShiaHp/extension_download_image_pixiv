@@ -114,7 +114,7 @@ chrome.runtime.onMessage.addListener(function (request) {
  function getFunction(typeFunction) {
      return getFunctionStrategies[typeFunction]
   }
-  if(request.notification ){
+  if(request.notification){
     getFunction(request.notification).call()
   }
 

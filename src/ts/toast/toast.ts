@@ -80,7 +80,7 @@ class Toast {
     this.create(Object.assign({}, this.defaultArg, arg, { title, text }))
   }
 
-  public success(title: string, text: string, arg?: ToastArg) {
+  public success(title: string, text: string, arg: ToastArg = this.defaultArg) {
     this.create(Object.assign({}, this.successArg, arg, { title, text }))
   }
 
@@ -93,17 +93,17 @@ class Toast {
   }
 
   private create(arg: ToastArg) {
-    // const container = document.createElement('div')
+    const container = document.createElement('div')
 
     const span = document.createElement('span')
     span.textContent = arg.title
     span.style.color = arg.color
 
-    // if (arg.text) {
-    //   const p = document.createElement('p')
-    //   p.innerHTML = arg.text
-    //   // container.appendChild(p)
-    // }
+    if (arg.text) {
+      const p = document.createElement('p')
+      p.innerHTML = arg.text
+      // container.appendChild(p)
+    }
 
     span.style.backgroundColor = arg.bgColor
     span.style.opacity = '0'
@@ -119,7 +119,7 @@ class Toast {
     }
 
     const rect = span.getBoundingClientRect()
-    console.log('rect', rect)
+
     let left = centerPoint - rect.width / 2
     const minLeft = 0
     const maxLeft = window.innerWidth - rect.width

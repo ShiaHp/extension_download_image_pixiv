@@ -4,6 +4,7 @@ import {
   setImageUrlOriginalStorage,
 } from "../utils/storage";
 import { API } from "../utils/api";
+import { toast } from '../toast/toast';
 
 const callAPI = async (id: string, type: number): Promise<object> => {
   const apiName = {
@@ -86,31 +87,36 @@ chrome.contextMenus.onClicked.addListener((event) => {
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
 
-  function closeTab() {
+
+  const closeTab = () => {
     return chrome.tabs.query({}, (tabs) => {
         for (let i = 1; i <= data; i++) {
           chrome.tabs.remove(tabs[tabs.length - i].id);
         }
       })
-    }
-  function reloadextension() {
+    };
+
+  const reloadExt = () => {
     return chrome.runtime.requestUpdateCheck(() => {
         chrome.runtime.reload();
       });
-    }
-  function downloadFileName() {
+    };
+
+  const downloadFileName = () => {
     return chrome.downloads.download({
        url: request.url,
        filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
        conflictAction: 'overwrite',
        saveAs: false,
      })
-   }
+   };
+
   const getFunctionStrategies = {
     Close: closeTab,
-    reloadextension: reloadextension,
+    reloadExt: reloadExt,
     downloadfilename: downloadFileName
   }
+
  function getFunction(typeFunction) {
      return getFunctionStrategies[typeFunction]
   }

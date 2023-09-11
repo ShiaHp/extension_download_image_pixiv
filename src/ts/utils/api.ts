@@ -1,22 +1,27 @@
 import { Artwork } from "../interface/artwork";
 
+interface FetchCredentials {
+  'omit': 'omit';
+  'same-origin': 'same-origin';
+  'include': 'include';
+};
+
+export interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  headers?: Headers,
+  credentials?: 'include' | 'same-origin' | 'omit'
+}
 
 export const myHeaders = new Headers();
-myHeaders.append("sec-fetch-site", "cross-site");
-myHeaders.append("referer", "https://www.pixiv.net/");
-
-export const requestOptions = {
+export const requestOptions: RequestOptions = {
   method: "GET",
   headers: myHeaders,
+  credentials: 'same-origin'
 };
 export class API {
-  static sendGetRequest<T>(url: string): Promise<T> {
+  static sendGetRequest<T>(url: string, options: RequestOptions = {}): Promise<T> {
     return new Promise((resolve, reject) => {
-        fetch(url,  {
-          method: 'get',
-          credentials: 'same-origin'
-        }
-          )
+        fetch(url, options)
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -51,7 +56,7 @@ export class API {
     const url = `https://gettweet.onrender.com/tweet/${id}`
     return this.sendGetRequest(url);
   }
-  static getArtwork(id: any): Promise<Artwork> {
+  static getArtwork(id: string): Promise<Artwork> {
     const url = `https://www.pixiv.net/ajax/illust/${id}`;
     return this.sendGetRequest(url);
   }
@@ -59,7 +64,6 @@ export class API {
   static getAllArtworks(id: string): Promise<Artwork> {
     const url = `https://www.pixiv.net/ajax/user/${id}/profile/all`;
     return new Promise((resolve, reject) => {
-
       fetch(url, requestOptions)
       .then((response) => {
         if (response.ok) {
@@ -79,6 +83,6 @@ export class API {
       });
   })
 }
-}
+};
 
 

@@ -6,7 +6,7 @@ export const idTweet = /[0-9]{19,21}/;
 export const format_pixiv: number = 0;
 export const format_twitter: number = 1;
 
-export interface ExtraNode extends Node {
+export interface ExtendNode extends Node {
   tagName: string;
   currentSrc: string;
 }
@@ -45,9 +45,32 @@ export class Utils {
     return urlArr;
   };
 
-  static isImageNode(node: ExtraNode) {
+  static isImageNode(node: ExtendNode) {
     return node?.tagName === 'IMG' && node instanceof Element;
   }
+
+  static isPixivWebsite(url: string) {
+    const pixivUrlPatterns = [
+      /^https?:\/\/www\.pixiv\.net\//,
+      /^https?:\/\/[^/]+\.pximg\.net\//,
+      /^https?:\/\/pbs\.twimg\.com\//
+    ];
+
+    return pixivUrlPatterns.some(p => p.test(url))
+  };
+
+
+  static isTwitter(url: string) {
+    const twitterPatterns = [
+      /^https?:\/\/twitter\.com\//
+    ];
+    return twitterPatterns.some(pattern => pattern.test(url));
+  };
+
+  static isAIArtWork(node: Node) {
+    // to do
+  };
+
 }
 
 

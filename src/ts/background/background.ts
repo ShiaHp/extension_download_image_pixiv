@@ -1,22 +1,14 @@
 import { Artwork } from './../interface/artwork';
-import { idPixiv, idTweet, Utils, format_twitter, format_pixiv } from "../utils/classified";
+import { Utils, format_pixiv } from "../utils/classified";
 import {
   setImageUrlOriginalStorage,
 } from "../utils/storage";
-import { API } from "../utils/api";
-import { toast } from '../toast/toast';
+import downloader from '../download/download';
+import { prevHandleBeforeDownload } from '../contentScript/contentScript';
+import { requestOptions } from '../utils/api';
+import { ChromeCommand } from '../utils/chrome-command';
 
-const callAPI = async (id: string, type: number): Promise<object> => {
-  const apiName = {
-    0: API.getArtwork(id),
-    1: API.getArtworkTwitter(id),
-  }
-  let infoArtwork: object = {};
-  await apiName[type].then((data : object) => {
-      infoArtwork = data;
-    });
-  return infoArtwork;
-};
+
 
 const createNewTab = (infoArtwork, type : number) => {
   const in4toOpen = type == format_pixiv ? infoArtwork.body.urls.original : Object.values(infoArtwork)[0] as string;
@@ -27,34 +19,34 @@ const createNewTab = (infoArtwork, type : number) => {
   setImageUrlOriginalStorage(in4toOpen);
 }
 
-const functionDownloadImage = async (id: string, type: number) => {
-  const infoArtwork: Artwork = await callAPI(id, type)
+// const functionDownloadImage = async (id: string, type: number) => {
+//   const infoArtwork: Artwork = await callAPI(id, type)
 
-  const artworkName = {
-    0: infoArtwork?.body?.pageCount,
-    1: infoArtwork,
-  }
-  if (type === format_twitter || artworkName[type] <=1) {
-    createNewTab(infoArtwork, type)
-  } else  {
-    const imgList = [];
-    for (let i = 0; i < artworkName[type]; i++) {
-      const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
-      imgList.push(url);
-    }
-    chrome.storage.local.set({ arrUrl1: imgList, isClose : 1 }, () => {
-      chrome.tabs.query({}, async() => {
-        chrome.tabs.create(
-          {
-            active: false,
-            url: infoArtwork.body.urls.original,
-          },
-        );
+//   const artworkName = {
+//     0: infoArtwork?.body?.pageCount,
+//     1: infoArtwork,
+//   }
+//   if (type === format_twitter || artworkName[type] <=1) {
+//     createNewTab(infoArtwork, type)
+//   } else  {
+//     const imgList = [];
+//     for (let i = 0; i < artworkName[type]; i++) {
+//       const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
+//       imgList.push(url);
+//     }
+//     chrome.storage.local.set({ arrUrl1: imgList, isClose : 1 }, () => {
+//       chrome.tabs.query({}, async() => {
+//         chrome.tabs.create(
+//           {
+//             active: false,
+//             url: infoArtwork.body.urls.original,
+//           },
+//         );
 
-      });
-    });
-  }
-}
+//       });
+//     });
+//   }
+// }
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -64,29 +56,50 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.contextMenus.onClicked.addListener((event) => {
+const pattern = /illust_id=(\d+)/;
+
+async function getUrlAfterDownload (newurl: string, filename: string): Promise<Response | void> {
+  try {
+    return downloader.startDownload(newurl, requestOptions)
+  } catch (error) {
+    chrome.runtime.sendMessage({ notification: 'reloadExt' })
+  }
+};
+
+chrome.contextMenus.onClicked.addListener(async (event) => {
   const types = ['selectionText', 'linkUrl'];
   const eventTypes = types.filter(type => Object.keys(event).includes(type));
 
   if (eventTypes.includes('selectionText')) {
-    // case text: priority higher
-    // todo
+
   } else if (eventTypes.includes('linkUrl')) {
     const belongsToWhatPlatform = Utils.isPixiv(event.linkUrl);
-
+    const url = decodeURIComponent(event.linkUrl).match(pattern)[1];
+    const data = await Utils.checkData(url);
+    const urlFromAPI = data.body.urls.original
+    const nameArtist = data?.body.userName || ''
+   const dataAFterDownload = await  await getUrlAfterDownload(
+    urlFromAPI,
+    nameArtist
+  ) as Response;
+  sendDownload(dataAFterDownload, 'something');
   }
-  // if (event.selectionText) {
-  //   functionDownloadImage(event.selectionText, format_pixiv );
-  // } else {
-  //   const typeToCheck: number = Utils.isPixiv(event.linkUrl)
-  //   const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idPixiv)[0] : event.linkUrl.match(idTweet)[0]
-  //   functionDownloadImage(exactName, typeToCheck);
-  // }
+
 });
+
+function sendDownload(downloadRes, fileName) {
+  downloadRes.arrayBuffer().then(async (buffer) => {
+
+    chrome.downloads.download({
+      url: 'data:application/octet-stream;base64,' + btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')),
+      filename: fileName,
+    });
+  });
+}
+
 
 chrome.runtime.onMessage.addListener(function (request) {
   const data = request.data || 1;
-
 
   const closeTab = () => {
     return chrome.tabs.query({}, (tabs) => {
@@ -117,13 +130,12 @@ chrome.runtime.onMessage.addListener(function (request) {
     downloadfilename: downloadFileName
   }
 
- function getFunction(typeFunction) {
-     return getFunctionStrategies[typeFunction]
-  }
+ const getFunction = (typeFunction) => {
+  return getFunctionStrategies[typeFunction]
+}
+
   if(request.notification){
     getFunction(request.notification).call()
   }
-
-
 
 });

@@ -11,7 +11,8 @@ const useSlot = (element: string | HTMLElement) => {
     document.body.appendChild(el);
     return el;
   }
-}
+};
+
 class ProgressBar {
   constructor () {
     this.createElements();
@@ -44,6 +45,7 @@ class ProgressBar {
     this.progressText = this.wrap.querySelector('.container__progress-text')
     this.progressBar = this.wrap.querySelector('.progress-bar');
     this.progressBarText = this.wrap.querySelector('.progress-bar__text');
+
   };
 
   public async createProgress (downloadRes: Response, fileName: string) {
@@ -51,7 +53,7 @@ class ProgressBar {
 
     if (existingProgressBar) {
       this.show();
-    }
+    };
 
     let dataDownload = downloadRes.clone();
     const contentLength = +downloadRes.headers.get("Content-Length");
@@ -60,12 +62,14 @@ class ProgressBar {
     await this.readContentLength(contentLength, reader);
   }
 
-
   public async readContentLength (
     contentLength: number,
     reader: ReadableStreamDefaultReader<Uint8Array>,
   ) {
     let receivedLength = 0;
+    let total = '';
+    total = `Total: ${(contentLength / this.MB).toFixed(1)} MB`;
+    this.setTotalProgress(total);
 
     while (true) {
       const { done, value } = await reader.read();
@@ -79,11 +83,10 @@ class ProgressBar {
       this.updateProgressBar(percentage);
     };
 
-    let total = '';
-    total = `Total: ${(receivedLength / this.MB).toFixed(1)} MB`;
-    this.progressText.innerText = total;
+
 
     if ((receivedLength === contentLength) || this.isFinishLoad() ) {
+      this.reset(100, 0);
       this.hide();
     }
   };
@@ -94,6 +97,7 @@ class ProgressBar {
       ChromeCommand.sendDownload(url, fileName);
     })
   };
+
 
   updateProgressBar (percentage: number) {
    if (percentage <=0 ) {
@@ -112,8 +116,24 @@ class ProgressBar {
     this.wrap.style.display = 'none';
   }
 
+  setTotalProgress(downloaded: string | number) {
+    if (typeof downloaded  === 'number') {
+      this.progressText.innerText = downloaded.toString();
+    } else {
+      this.progressText.innerText = downloaded;
+    }
+  }
+
   isFinishLoad() {
     return this.progressBarText.innerHTML === '100%' || this.progressBarText.innerHTML === 'Infinity%'
+  }
+
+  reset(progressBarNum: number, downloadNum: number = 0) {
+    if (progressBarNum === 0) {
+      this.hide;
+    }
+
+    this.setTotalProgress(downloadNum)
   }
 }
 const progressBar = new ProgressBar()

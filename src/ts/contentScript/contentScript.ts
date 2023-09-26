@@ -16,7 +16,7 @@ async function asyncEachUrl (array, callback) {
   }
 }
 
-const prevHandleBeforeDownload = async (url: string) => {
+export const prevHandleBeforeDownload = async (url: string) => {
   queue = []
   const data = await Utils.checkData(url)
   const nameArtist = data?.body.userName || ''

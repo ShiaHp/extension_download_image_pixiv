@@ -21,3 +21,8 @@ export const responseListener = (
     value: "*",
   });
 }
+
+
+export const something = (blob) => {
+  return URL.createObjectURL(blob);
+}

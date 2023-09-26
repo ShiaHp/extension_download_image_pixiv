@@ -2,6 +2,53 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/ts/download/download.ts":
+/*!*************************************!*\
+  !*** ./src/ts/download/download.ts ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+class Downloader {
+    constructor() {
+        this.retries = 4;
+        this.delay = 1000;
+    }
+    ;
+    startDownload(url, options = {}) {
+        this.options = options;
+        this.url = url;
+        return this.getRetryDownload(this.url, this.retries);
+    }
+    ;
+    getRetryDownload(newurl, retries) {
+        return fetch(newurl, this.options).catch((e) => this.onError(e, retries));
+    }
+    ;
+    waitToDownloadAgain(delay) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, delay);
+        });
+    }
+    ;
+    onError(e, tries) {
+        let triesLeft = tries - 1;
+        if (!triesLeft) {
+            throw new Error(e);
+        }
+        return this.waitToDownloadAgain(this.delay).then(() => this.getRetryDownload(this.url, triesLeft));
+    }
+}
+;
+const downloader = new Downloader();
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (downloader);
+
+
+/***/ }),
+
 /***/ "./src/ts/utils/api.ts":
 /*!*****************************!*\
   !*** ./src/ts/utils/api.ts ***!
@@ -23,20 +70,17 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+;
 const myHeaders = new Headers();
-myHeaders.append("sec-fetch-site", "cross-site");
-myHeaders.append("referer", "https://www.pixiv.net/");
 const requestOptions = {
     method: "GET",
     headers: myHeaders,
+    credentials: 'same-origin'
 };
 class API {
-    static sendGetRequest(url) {
+    static sendGetRequest(url, options = {}) {
         return new Promise((resolve, reject) => {
-            fetch(url, {
-                method: 'get',
-                credentials: 'same-origin'
-            })
+            fetch(url, options)
                 .then((response) => {
                 if (response.ok) {
                     return response.json();
@@ -96,6 +140,7 @@ class API {
         });
     }
 }
+;
 
 
 /***/ }),
@@ -134,18 +179,25 @@ class Utils {
         let isPixiv = name.indexOf("pixiv") > -1;
         return isPixiv ? 0 : 1;
     }
+    ;
+    static getIdArtWork(url) {
+        return url.match(idPixiv)[1];
+    }
+    ;
     static getDataUrl(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = url.match(idPixiv)[1];
+            const id = this.getIdArtWork(url);
             const data = yield _api__WEBPACK_IMPORTED_MODULE_0__.API.getArtwork(id);
             return data || {};
         });
     }
+    ;
     static checkData(url) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.getDataUrl(url).then((data) => data);
         });
     }
+    ;
     static classifiedPageCount(arkwork) {
         var _a, _b;
         const urlArr = [];
@@ -162,6 +214,30 @@ class Utils {
         }
         return urlArr;
     }
+    ;
+    static isImageNode(node) {
+        return (node === null || node === void 0 ? void 0 : node.tagName) === 'IMG' && node instanceof Element;
+    }
+    static isPixivWebsite(url) {
+        const pixivUrlPatterns = [
+            /^https?:\/\/www\.pixiv\.net\//,
+            /^https?:\/\/[^/]+\.pximg\.net\//,
+            /^https?:\/\/pbs\.twimg\.com\//
+        ];
+        return pixivUrlPatterns.some(p => p.test(url));
+    }
+    ;
+    static isTwitter(url) {
+        const twitterPatterns = [
+            /^https?:\/\/twitter\.com\//
+        ];
+        return twitterPatterns.some(pattern => pattern.test(url));
+    }
+    ;
+    static isAIArtWork(node) {
+        // to do
+    }
+    ;
 }
 
 
@@ -333,7 +409,8 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_classified__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/classified */ "./src/ts/utils/classified.ts");
 /* harmony import */ var _utils_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/storage */ "./src/ts/utils/storage.ts");
-/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/api */ "./src/ts/utils/api.ts");
+/* harmony import */ var _download_download__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../download/download */ "./src/ts/download/download.ts");
+/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/api */ "./src/ts/utils/api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -346,17 +423,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const callAPI = (id, type) => __awaiter(void 0, void 0, void 0, function* () {
-    const apiName = {
-        0: _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtwork(id),
-        1: _utils_api__WEBPACK_IMPORTED_MODULE_2__.API.getArtworkTwitter(id),
-    };
-    let infoArtwork = {};
-    yield apiName[type].then((data) => {
-        infoArtwork = data;
-    });
-    return infoArtwork;
-});
+
 const createNewTab = (infoArtwork, type) => {
     const in4toOpen = type == _utils_classified__WEBPACK_IMPORTED_MODULE_0__.format_pixiv ? infoArtwork.body.urls.original : Object.values(infoArtwork)[0];
     chrome.tabs.create({
@@ -365,32 +432,32 @@ const createNewTab = (infoArtwork, type) => {
     });
     (0,_utils_storage__WEBPACK_IMPORTED_MODULE_1__.setImageUrlOriginalStorage)(in4toOpen);
 };
-const functionDownloadImage = (id, type) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const infoArtwork = yield callAPI(id, type);
-    const artworkName = {
-        0: (_a = infoArtwork === null || infoArtwork === void 0 ? void 0 : infoArtwork.body) === null || _a === void 0 ? void 0 : _a.pageCount,
-        1: infoArtwork,
-    };
-    if (type === _utils_classified__WEBPACK_IMPORTED_MODULE_0__.format_twitter || artworkName[type] <= 1) {
-        createNewTab(infoArtwork, type);
-    }
-    else {
-        const imgList = [];
-        for (let i = 0; i < artworkName[type]; i++) {
-            const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
-            imgList.push(url);
-        }
-        chrome.storage.local.set({ arrUrl1: imgList, isClose: 1 }, () => {
-            chrome.tabs.query({}, () => __awaiter(void 0, void 0, void 0, function* () {
-                chrome.tabs.create({
-                    active: false,
-                    url: infoArtwork.body.urls.original,
-                });
-            }));
-        });
-    }
-});
+// const functionDownloadImage = async (id: string, type: number) => {
+//   const infoArtwork: Artwork = await callAPI(id, type)
+//   const artworkName = {
+//     0: infoArtwork?.body?.pageCount,
+//     1: infoArtwork,
+//   }
+//   if (type === format_twitter || artworkName[type] <=1) {
+//     createNewTab(infoArtwork, type)
+//   } else  {
+//     const imgList = [];
+//     for (let i = 0; i < artworkName[type]; i++) {
+//       const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
+//       imgList.push(url);
+//     }
+//     chrome.storage.local.set({ arrUrl1: imgList, isClose : 1 }, () => {
+//       chrome.tabs.query({}, async() => {
+//         chrome.tabs.create(
+//           {
+//             active: false,
+//             url: infoArtwork.body.urls.original,
+//           },
+//         );
+//       });
+//     });
+//   }
+// }
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         contexts: ["selection", "link"],
@@ -398,54 +465,71 @@ chrome.runtime.onInstalled.addListener(() => {
         id: "download-image",
     });
 });
-chrome.contextMenus.onClicked.addListener((event) => {
+const pattern = /illust_id=(\d+)/;
+function getUrlAfterDownload(newurl, filename) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return _download_download__WEBPACK_IMPORTED_MODULE_2__["default"].startDownload(newurl, _utils_api__WEBPACK_IMPORTED_MODULE_3__.requestOptions);
+        }
+        catch (error) {
+            chrome.runtime.sendMessage({ notification: 'reloadExt' });
+        }
+    });
+}
+;
+chrome.contextMenus.onClicked.addListener((event) => __awaiter(void 0, void 0, void 0, function* () {
     const types = ['selectionText', 'linkUrl'];
     const eventTypes = types.filter(type => Object.keys(event).includes(type));
     if (eventTypes.includes('selectionText')) {
-        // case text: priority higher
-        // todo
     }
     else if (eventTypes.includes('linkUrl')) {
         const belongsToWhatPlatform = _utils_classified__WEBPACK_IMPORTED_MODULE_0__.Utils.isPixiv(event.linkUrl);
+        const url = decodeURIComponent(event.linkUrl).match(pattern)[1];
+        const data = yield _utils_classified__WEBPACK_IMPORTED_MODULE_0__.Utils.checkData(url);
+        const urlFromAPI = data.body.urls.original;
+        const nameArtist = (data === null || data === void 0 ? void 0 : data.body.userName) || '';
+        const dataAFterDownload = yield yield getUrlAfterDownload(urlFromAPI, nameArtist);
+        sendDownload(dataAFterDownload, 'something');
     }
-    // if (event.selectionText) {
-    //   functionDownloadImage(event.selectionText, format_pixiv );
-    // } else {
-    //   const typeToCheck: number = Utils.isPixiv(event.linkUrl)
-    //   const exactName: string = typeToCheck == format_pixiv  ? event.linkUrl.match(idPixiv)[0] : event.linkUrl.match(idTweet)[0]
-    //   functionDownloadImage(exactName, typeToCheck);
-    // }
-});
+}));
+function sendDownload(downloadRes, fileName) {
+    downloadRes.arrayBuffer().then((buffer) => __awaiter(this, void 0, void 0, function* () {
+        chrome.downloads.download({
+            url: 'data:application/octet-stream;base64,' + btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')),
+            filename: fileName,
+        });
+    }));
+}
 chrome.runtime.onMessage.addListener(function (request) {
     const data = request.data || 1;
-    function closeTab() {
+    const closeTab = () => {
         return chrome.tabs.query({}, (tabs) => {
             for (let i = 1; i <= data; i++) {
                 chrome.tabs.remove(tabs[tabs.length - i].id);
             }
         });
-    }
-    function reloadextension() {
+    };
+    const reloadExt = () => {
         return chrome.runtime.requestUpdateCheck(() => {
             chrome.runtime.reload();
         });
-    }
-    function downloadFileName() {
+    };
+    const downloadFileName = () => {
         return chrome.downloads.download({
             url: request.url,
             filename: `downloadFromPixiv/${request.filename}/pixiv-${Date.now()}.filename`,
             conflictAction: 'overwrite',
             saveAs: false,
         });
-    }
+    };
     const getFunctionStrategies = {
         Close: closeTab,
-        reloadextension: reloadextension,
+        reloadExt: reloadExt,
         downloadfilename: downloadFileName
     };
-    function getFunction(typeFunction) {
+    const getFunction = (typeFunction) => {
         return getFunctionStrategies[typeFunction];
-    }
+    };
     if (request.notification) {
         getFunction(request.notification).call();
     }

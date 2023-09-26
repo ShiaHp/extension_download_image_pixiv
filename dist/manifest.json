@@ -28,7 +28,7 @@
   "content_scripts": [
     {
 
-      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*","*://pbs.twimg.com/*"],
+      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*","*://pbs.twimg.com/*", "*://twitter.com/*"],
       "js": [
         "contentScript.js"
       ],
@@ -48,6 +48,7 @@
     "*://www.pixiv.net/*",
     "*://www.pixivision.net/*",
     "*://*.pximg.net/*",
-    "*://*.pixiv.cat/*"
+    "*://*.pixiv.cat/*",
+    "*://twitter.com/*"
   ]
 }

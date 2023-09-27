@@ -22,8 +22,7 @@ export class Utils {
 
   static async getDataUrl(url: string): Promise<Artwork> {
     const id = this.getIdArtWork(url);
-    const data = await API.getArtwork(id);
-    return data || {};
+    return await API.getArtwork(id) || {} as Artwork;
   };
 
   static async checkData(url: string) {

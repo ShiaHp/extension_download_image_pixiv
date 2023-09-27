@@ -20,12 +20,15 @@ export class Utils {
     return url.match(idPixiv)[1]
   };
 
-  static async getDataUrl(url: string): Promise<Artwork> {
+  static async getDataUrl(url: string, type = 'id'): Promise<Artwork> {
     const id = this.getIdArtWork(url);
     return await API.getArtwork(id) || {} as Artwork;
   };
 
-  static async checkData(url: string) {
+  static async checkData(url: string, type = 'url') {
+    if (type === 'id') {
+      return await API.getArtwork(url);
+    }
     return this.getDataUrl(url).then((data) => data);
   };
 

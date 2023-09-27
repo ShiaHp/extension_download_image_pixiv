@@ -19,34 +19,6 @@ const createNewTab = (infoArtwork, type : number) => {
   setImageUrlOriginalStorage(in4toOpen);
 }
 
-// const functionDownloadImage = async (id: string, type: number) => {
-//   const infoArtwork: Artwork = await callAPI(id, type)
-
-//   const artworkName = {
-//     0: infoArtwork?.body?.pageCount,
-//     1: infoArtwork,
-//   }
-//   if (type === format_twitter || artworkName[type] <=1) {
-//     createNewTab(infoArtwork, type)
-//   } else  {
-//     const imgList = [];
-//     for (let i = 0; i < artworkName[type]; i++) {
-//       const url = `${infoArtwork.body.urls.original}`.replace("_p0", `_p${i}`);
-//       imgList.push(url);
-//     }
-//     chrome.storage.local.set({ arrUrl1: imgList, isClose : 1 }, () => {
-//       chrome.tabs.query({}, async() => {
-//         chrome.tabs.create(
-//           {
-//             active: false,
-//             url: infoArtwork.body.urls.original,
-//           },
-//         );
-
-//       });
-//     });
-//   }
-// }
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -75,10 +47,10 @@ chrome.contextMenus.onClicked.addListener(async (event) => {
   } else if (eventTypes.includes('linkUrl')) {
     const belongsToWhatPlatform = Utils.isPixiv(event.linkUrl);
     const url = decodeURIComponent(event.linkUrl).match(pattern)[1];
-    const data = await Utils.checkData(url);
-    const urlFromAPI = data.body.urls.original
-    const nameArtist = data?.body.userName || ''
-   const dataAFterDownload = await  await getUrlAfterDownload(
+    const data = await Utils.checkData(url, 'id');
+    const urlFromAPI = data.body.urls.original;
+    const nameArtist = data?.body.userName || '';
+   const dataAFterDownload = await getUrlAfterDownload(
     urlFromAPI,
     nameArtist
   ) as Response;
@@ -88,13 +60,9 @@ chrome.contextMenus.onClicked.addListener(async (event) => {
 });
 
 function sendDownload(downloadRes, fileName) {
-  downloadRes.arrayBuffer().then(async (buffer) => {
+  console.log('downloadRes', downloadRes);
+  chrome.downloads.download({url: 'data:application/json;base64,' + btoa(JSON.stringify(downloadRes.url)), filename: 'file'})
 
-    chrome.downloads.download({
-      url: 'data:application/octet-stream;base64,' + btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')),
-      filename: fileName,
-    });
-  });
 }
 
 

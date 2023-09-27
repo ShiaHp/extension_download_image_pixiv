@@ -19,7 +19,8 @@
     "downloads",
     "downloads.shelf",
     "management" ,
-    "declarativeNetRequestWithHostAccess"
+    "declarativeNetRequestWithHostAccess",
+    "offscreen"
   ],
   "options_page": "options.html",
   "background": {

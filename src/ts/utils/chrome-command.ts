@@ -55,7 +55,6 @@ export class ChromeCommand {
   };
 
   static sendDownload(url: string, filename: unknown) {
-    console.log('finish download', url);
    return chrome.runtime.sendMessage({
       notification: "downloadfilename",
       url: url,

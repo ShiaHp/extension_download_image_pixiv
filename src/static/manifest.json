@@ -8,11 +8,6 @@
     "48": "icon.png",
     "128": "icon.png"
   },
-  "browser_action": {
-    "default_popup": "popup.html",
-    "default_title": "Extension_Pixiv",
-    "default_icon": "icon.png"
-  },
   "permissions": [
     "contextMenus",
     "search",
@@ -23,15 +18,9 @@
     "webRequest",
     "downloads",
     "downloads.shelf",
-    "*://www.pixiv.net/*",
-    "*://www.pixivision.net/*",
-    "*://*.techorus-cdn.com/*",
-    "*://*.pximg.net/*",
-    "*://*.pixiv.cat/*",
-    "webRequest",
-    "webRequestBlocking",
     "management" ,
-    "declarativeNetRequestWithHostAccess"
+    "declarativeNetRequestWithHostAccess",
+    "offscreen"
   ],
   "options_page": "options.html",
   "background": {
@@ -39,11 +28,12 @@
   },
   "content_scripts": [
     {
-    
-      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*","*://pbs.twimg.com/*"],
+
+      "matches": ["*://www.pixiv.net/*","*://*.pximg.net/*","*://pbs.twimg.com/*", "*://twitter.com/*"],
       "js": [
         "contentScript.js"
-      ]
+      ],
+      "css": ["style.scss", "toast.scss"]
     }
   ],
   "declarative_net_request": {
@@ -59,6 +49,7 @@
     "*://www.pixiv.net/*",
     "*://www.pixivision.net/*",
     "*://*.pximg.net/*",
-    "*://*.pixiv.cat/*"
+    "*://*.pixiv.cat/*",
+    "*://twitter.com/*"
   ]
 }
